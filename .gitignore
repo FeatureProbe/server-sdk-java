@@ -1,0 +1,13 @@
+output
+/target/
+*.iml
+.arcconfig
+.idea
+.settings
+.classpath
+.project
+*.iml
+pom.xml.versionsBackup
+.java-version
+.DS_Store
+*.tar.gz
