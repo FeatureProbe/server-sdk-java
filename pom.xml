@@ -37,9 +37,9 @@
     </scm>
 
     <properties>
+        <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>1.8</java.version>
         <version.guava>31.1-jre</version.guava>
         <version.okhttp>3.14.9</version.okhttp>
         <version.logback>1.2.11</version.logback>
@@ -141,6 +141,15 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
+                </configuration>
+            </plugin>
             <plugin>
                 <!-- The gmavenplus plugin is used to compile Groovy code. To learn more about this plugin,
                 visit https://github.com/groovy/GMavenPlus/wiki -->
