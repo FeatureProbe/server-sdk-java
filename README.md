@@ -1,4 +1,8 @@
 # FeatureProbe Server Side SDK for Java
+[![Coverage Status](https://coveralls.io/repos/github/FeatureProbe/server-sdk-java/badge.svg?branch=main)](https://coveralls.io/github/FeatureProbe/server-sdk-java?branch=main)
+[![GitHub Star](https://img.shields.io/github/stars/FeatureProbe/server-sdk-java)](https://github.com/FeatureProbe/server-sdk-java/stargazers)
+[![License](https://img.shields.io/github/license/FeatureProbe/server-sdk-java)](https://github.com/FeatureProbe/server-sdk-java/blob/main/LICENSE)
+
 
 Feature Probe is an open source feature management service. This SDK is used to control features in java programs. This
 SDK is designed primarily for use in multi-user systems such as web servers and applications.
