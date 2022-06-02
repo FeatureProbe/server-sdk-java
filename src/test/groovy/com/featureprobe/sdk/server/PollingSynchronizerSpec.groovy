@@ -2,7 +2,7 @@ package com.featureprobe.sdk.server
 
 import spock.lang.Specification
 
-class PollingSynchronizerSpec extends Specification{
+class PollingSynchronizerSpec extends Specification {
 
     def FPConfig config
     def FeatureProbe featureProbe

@@ -194,7 +194,7 @@
                 <configuration>
                     <excludes>
                         <exclude>**/featureprobe/sdk/example/*</exclude>
-                        <exclude>**/featureprobe/server/exceptions/*</exclude>
+                        <exclude>**/featureprobe/sdk/server/exceptions/*</exclude>
                     </excludes>
                 </configuration>
                 <executions>
