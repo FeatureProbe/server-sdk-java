@@ -74,6 +74,7 @@ class FeatureProbeSpec extends Specification {
                     case "bool_detail":
                         def boolDetailRes = featureProbe.boolDetail(toggleKey, user,
                                 defaultValue.asBoolean())
+                        def detailStr = boolDetailRes.toString()
                         assert boolDetailRes.value == expectValue.asBoolean()
                         break
                     case "number_detail":

@@ -15,13 +15,6 @@ public class FPDetail<T> {
     public FPDetail() {
     }
 
-    public FPDetail(T value, Optional<Integer> ruleIndex, Optional<Long> version, String reason) {
-        this.value = value;
-        this.ruleIndex = ruleIndex;
-        this.version = version;
-        this.reason = reason;
-    }
-
     public T getValue() {
         return value;
     }
