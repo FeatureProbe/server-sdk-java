@@ -70,7 +70,9 @@ public final class Toggle {
             } else {
                 res.setValue(variation);
             }
-            res.setReason("Rule " + ruleIndex.get() + " hit");
+            if (ruleIndex.isPresent()) {
+                res.setReason("Rule " + ruleIndex.get() + " hit");
+            }
         }
         return res;
     }
