@@ -56,7 +56,7 @@ public final class Toggle {
     private EvaluationResult createDefaultResult(FPUser user, String toggleKey, Object defaultValue, String warning) {
         EvaluationResult defaultResult = hitValue(defaultServe.evalIndex(user, toggleKey), defaultValue,
                 Optional.empty());
-        defaultResult.setReason("Default rule hit was successful." + warning);
+        defaultResult.setReason("Default rule hit. " + warning);
         return defaultResult;
     }
 
@@ -70,6 +70,7 @@ public final class Toggle {
             } else {
                 res.setValue(variation);
             }
+            res.setReason("Rule " + hitResult.getIndex().get() + " hit");
         }
         return res;
     }
