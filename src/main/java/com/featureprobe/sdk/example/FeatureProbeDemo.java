@@ -12,44 +12,32 @@ import java.util.Map;
 public class FeatureProbeDemo {
 
     private static final FPConfig config = FPConfig.builder()
-            .remoteUri("http://127.0.0.1:4007")
+            .remoteUri("http://localhost:4007")
             .pollingMode(Duration.ofSeconds(3))
             .useMemoryRepository()
             .build();
 
     private static final FeatureProbe fpClient =
-            new FeatureProbe("server-61db54ecea79824cae3ac38d73f1961d698d0477", config);
+            new FeatureProbe("server-8ed48815ef044428826787e9a238b9c6a479f98c", config);
 
     public static void main(String[] args) {
 
-        FPUser user = new FPUser("user_unique");
-        user.with("userId", "122121211212");
-        user.with("tel", "12345678998");
+        FPUser user = new FPUser("user_id");
+        user.with("city", "New York");
 
-        boolean boolValue = fpClient.boolValue("bool_toggle_key", user, false);
-        System.out.println("FeatureProbe evaluation boolean type toggle result is :" + boolValue);
-        FPDetail<Boolean> boolDetail = fpClient.boolDetail("bool_toggle_key", user, false);
-        System.out.println("FeatureProbe evaluation boolean type toggle result detail is :" + boolDetail.toString());
-
-        String stringValue = fpClient.stringValue("string_toggle_key", user, "default");
-        System.out.println("FeatureProbe evaluation string type toggle result is :" + stringValue);
-        FPDetail<String> stringDetail = fpClient.stringDetail("string_toggle_key", user, "default");
-        System.out.println("FeatureProbe evaluation string type toggle result detail is :" + stringDetail.toString());
+        double discount = fpClient.numberValue("commodity_spike_activity", user, 0);
+        System.out.println("user1 discount is :" + discount);
+        FPDetail<Double> detail = fpClient.numberDetail("commodity_spike_activity", user, 0);
+        System.out.println("detail:" + detail.getReason());
 
 
-        double numberValue = fpClient.numberValue("number_toggle_key", user, 0);
-        System.out.println("FeatureProbe evaluation number type toggle result is :" + numberValue);
-        FPDetail<Double> numberDetail = fpClient.numberDetail("number_toggle_key", user, 0);
-        System.out.println("FeatureProbe evaluation number type toggle result detail is :" + numberDetail.toString());
-
-
-        Map<String, String> defaultJson = new HashMap<>();
-        defaultJson.put("name", "FeatureProbe");
-        Map<String, String> jsonValue = fpClient.jsonValue("json_toggle_key", user, defaultJson, Map.class);
-        System.out.println("FeatureProbe evaluation json type toggle result is :" + jsonValue);
-        FPDetail<Map> jsonDetail = fpClient.jsonDetail("json_toggle_key", user, defaultJson, Map.class);
-        System.out.println("FeatureProbe evaluation json type toggle result detail is :" + jsonDetail.toString());
-
+        FPUser user2 = new FPUser("user_id2");
+        user2.with("city", "Paris");
+        discount = fpClient.numberValue("commodity_spike_activity", user2, 0);
+        System.out.println("user2 discount is :" + discount);
+        FPDetail<Double> detail2 = fpClient.numberDetail("commodity_spike_activity", user2, 0);
+        System.out.println("detail2:" + detail2.getReason());
+        System.out.println("rule index:" + detail2.getRuleIndex().get());
     }
 
 }
