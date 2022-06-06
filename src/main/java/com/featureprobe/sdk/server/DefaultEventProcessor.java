@@ -11,8 +11,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.slf4j.Logger;
-
-import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -28,8 +27,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class DefaultEventProcessor implements EventProcessor {
 
     private static final Logger logger = Loggers.EVENT;
-
-    private static final String GET_REPOSITORY_DATA_API = "/api/server/events";
 
     private static final String GET_SDK_KEY_HEADER = "Authorization";
 
@@ -152,7 +149,7 @@ public class DefaultEventProcessor implements EventProcessor {
 
         private final ObjectMapper mapper = new ObjectMapper();
 
-        private final URI remoteUri;
+        private final URL apiUrl;
 
         private final Headers headers;
 
@@ -161,7 +158,7 @@ public class DefaultEventProcessor implements EventProcessor {
         private final List<EventRepository> repositories;
 
         SendEventsTask(FPContext context, List<EventRepository> repositories) {
-            this.remoteUri = context.getRemoteUri();
+            this.apiUrl = context.getEventUrl();
             Headers.Builder headerBuilder = new Headers.Builder();
             OkHttpClient.Builder builder = new OkHttpClient.Builder()
                     .connectionPool(context.getHttpConfiguration().connectionPool)
@@ -181,7 +178,7 @@ public class DefaultEventProcessor implements EventProcessor {
                 RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"),
                         mapper.writeValueAsString(repositories));
                 request = new Request.Builder()
-                        .url(remoteUri.toString() + GET_REPOSITORY_DATA_API)
+                        .url(apiUrl.toString())
                         .headers(headers)
                         .post(requestBody)
                         .build();

@@ -1,6 +1,7 @@
 package com.featureprobe.sdk.server;
 
 import java.net.URI;
+import java.net.URL;
 import java.time.Duration;
 
 public final class FPConfig {
@@ -14,6 +15,10 @@ public final class FPConfig {
     final Duration refreshInterval;
 
     final URI remoteUri;
+
+    URL synchronizerUrl;
+
+    URL eventUrl;
 
     final String location;
 
@@ -36,6 +41,8 @@ public final class FPConfig {
         this.eventProcessorFactory = new DefaultEventProcessorFactory();
         this.httpConfiguration = builder.httpConfiguration == null ? HttpConfiguration.DEFAULT :
                 builder.httpConfiguration;
+        this.synchronizerUrl = builder.synchronizerUrl;
+        this.eventUrl = builder.eventUrl;
     }
 
     public static Builder builder() {
@@ -55,6 +62,10 @@ public final class FPConfig {
         private DataRepositoryFactory dataRepository;
 
         private HttpConfiguration httpConfiguration;
+
+        private URL synchronizerUrl;
+
+        private URL eventUrl;
 
         public Builder() {
         }
@@ -94,6 +105,16 @@ public final class FPConfig {
 
         public Builder useMemoryRepository() {
             this.dataRepository = new MemoryDataRepositoryFactory();
+            return this;
+        }
+
+        public Builder synchronizerUrl(URL synchronizerUrl) {
+            this.synchronizerUrl = synchronizerUrl;
+            return this;
+        }
+
+        public Builder eventUrl(URL eventUrl) {
+            this.eventUrl = eventUrl;
             return this;
         }
 

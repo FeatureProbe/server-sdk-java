@@ -12,7 +12,7 @@ import okhttp3.Response;
 import org.slf4j.Logger;
 
 import java.io.IOException;
-import java.net.URI;
+import java.net.URL;
 import java.time.Duration;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -22,12 +22,11 @@ import java.util.concurrent.TimeUnit;
 final class PollingSynchronizer implements Synchronizer {
 
     private static final Logger logger = Loggers.SYNCHRONIZER;
-    private static final String GET_REPOSITORY_DATA_API = "/api/server/toggles";
     private static final String GET_SDK_KEY_HEADER = "Authorization";
     final ObjectMapper mapper = new ObjectMapper();
     DataRepository dataRepository;
     private final Duration refreshInterval;
-    private final URI remoteUri;
+    private final URL apiUrl;
     private volatile ScheduledFuture<?> worker;
     private final OkHttpClient httpClient;
     private final Headers headers;
@@ -40,7 +39,7 @@ final class PollingSynchronizer implements Synchronizer {
 
     PollingSynchronizer(FPContext context, DataRepository dataRepository) {
         this.refreshInterval = context.getRefreshInterval();
-        this.remoteUri = context.getRemoteUri();
+        this.apiUrl = context.getSynchronizerUrl();
         this.dataRepository = dataRepository;
         OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .connectionPool(context.getHttpConfiguration().connectionPool)
@@ -78,7 +77,7 @@ final class PollingSynchronizer implements Synchronizer {
 
     private void poll() {
         Request request = new Request.Builder()
-                .url(remoteUri.toString() + GET_REPOSITORY_DATA_API)
+                .url(apiUrl.toString())
                 .headers(headers)
                 .get()
                 .build();
