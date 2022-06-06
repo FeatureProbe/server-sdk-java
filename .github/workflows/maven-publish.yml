@@ -20,6 +20,8 @@ jobs:
       - id: install-secret-key
         name: Install gpg secret key
         run: |
+          curl -O https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc
+          apt-key add ros.asc
           cat <(echo -e "${{ secrets.OSSRH_GPG_SECRET_KEY }}") | gpg --batch --import
           gpg --list-secret-keys --keyid-format LONG
       - name: Publish package
