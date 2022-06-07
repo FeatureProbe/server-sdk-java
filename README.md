@@ -1,5 +1,5 @@
 # FeatureProbe Server Side SDK for Java
-[![Coverage Status](https://coveralls.io/repos/github/FeatureProbe/server-sdk-java/badge.svg?branch=main)](https://coveralls.io/github/FeatureProbe/server-sdk-java?branch=main)
+[![codecov](https://codecov.io/gh/FeatureProbe/server-sdk-java/branch/main/graph/badge.svg?token=WZC3ZS6NNL)](https://codecov.io/gh/FeatureProbe/server-sdk-java)
 [![GitHub Star](https://img.shields.io/github/stars/FeatureProbe/server-sdk-java)](https://github.com/FeatureProbe/server-sdk-java/stargazers)
 [![License](https://img.shields.io/github/license/FeatureProbe/server-sdk-java)](https://github.com/FeatureProbe/server-sdk-java/blob/main/LICENSE)
 
@@ -44,7 +44,7 @@ public class Demo {
             .useMemoryRepository()
             .build();
 
-    private static final FeatureProbe fpClient = new FeatureProbe("server-61db54ecea79824cae3ac38d73f1961d698d0477",
+    private static final FeatureProbe fpClient = new FeatureProbe("server-8ed48815ef044428826787e9a238b9c6a479f98c",
             config);
 }
 ```
@@ -61,18 +61,18 @@ public class Demo {
             .useMemoryRepository()
             .build();
 
-    private static final FeatureProbe fpClient = new FeatureProbe("server-61db54ecea79824cae3ac38d73f1961d698d0477",
+    private static final FeatureProbe fpClient = new FeatureProbe("server-8ed48815ef044428826787e9a238b9c6a479f98c",
             config);
 
     public void test() {
-        FPUser user = new FPUser("user_unique");
+        FPUser user = new FPUser("user_unique_id");
         user.with("userId", "9876");
         user.with("tel", "12345678998");
         boolean boolValue = fpClient.boolValue("bool_toggle_key", user, false);
         if (boolValue) {
-             #application code to show the feature
+            // application code to show the feature
         } else {
-            #the code to run if the feature is off
+            // the code to run if the feature is off
         }
     }
 }
