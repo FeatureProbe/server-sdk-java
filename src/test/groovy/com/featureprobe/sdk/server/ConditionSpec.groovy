@@ -2,6 +2,7 @@ package com.featureprobe.sdk.server
 
 import com.featureprobe.sdk.server.model.Condition
 import com.featureprobe.sdk.server.model.ConditionType
+import com.featureprobe.sdk.server.model.PredicateType
 import spock.lang.Specification
 
 class ConditionSpec extends Specification {
@@ -19,7 +20,7 @@ class ConditionSpec extends Specification {
     def "[is one of] condition match"() {
         when:
         condition.setObjects(["12345", "987654", "665544", "13797347245"])
-        condition.setPredicate("is one of")
+        condition.setPredicate(PredicateType.IS_ONE_OF)
         user.with("userId", "12345")
         def hitSuccess = condition.matchObjects(user)
         user.with("userId", "999999")
@@ -34,7 +35,7 @@ class ConditionSpec extends Specification {
     def "[ends with] condition match"() {
         when:
         condition.setObjects(["123", "888"])
-        condition.setPredicate("ends with")
+        condition.setPredicate(PredicateType.ENDS_WITH)
         user.with("userId", "123123")
         def hitSuccess = condition.matchObjects(user)
         user.with("userId", "999999")
@@ -49,7 +50,7 @@ class ConditionSpec extends Specification {
     def "[starts with] condition match"() {
         when:
         condition.setObjects(["123"])
-        condition.setPredicate("starts with")
+        condition.setPredicate(PredicateType.STARTS_WITH)
         user.with("userId", "123321")
         def hitSuccess = condition.matchObjects(user)
         user.with("userId", "3333")
@@ -64,7 +65,7 @@ class ConditionSpec extends Specification {
     def "[contains] condition match"() {
         when:
         condition.setObjects(["123", "456"])
-        condition.setPredicate("contains")
+        condition.setPredicate(PredicateType.CONTAINS)
         user.with("userId", "456433")
         def hitSuccess = condition.matchObjects(user)
         user.with("userId", "999999")
@@ -79,7 +80,7 @@ class ConditionSpec extends Specification {
     def "[matches regex] condition match"() {
         when:
         condition.setObjects(["0?(13|14|15|18)[0-9]{9}"])
-        condition.setPredicate("matches regex")
+        condition.setPredicate(PredicateType.MATCHES_REGEX)
         user.with("userId", "13797347245")
         def hitSuccess = condition.matchObjects(user)
         user.with("userId", "122122")
@@ -94,7 +95,7 @@ class ConditionSpec extends Specification {
     def "[is not any of] condition match"() {
         when:
         condition.setObjects(["12345", "987654", "665544"])
-        condition.setPredicate("is not any of")
+        condition.setPredicate(PredicateType.IS_NOT_ANY_OF)
         user.with("userId", "999999999")
         def hitSuccess = condition.matchObjects(user)
         user.with("userId", "12345")
@@ -109,7 +110,7 @@ class ConditionSpec extends Specification {
     def "[does not end with] condition match"() {
         when:
         condition.setObjects(["123", "456"])
-        condition.setPredicate("does not end with")
+        condition.setPredicate(PredicateType.DOES_NOT_END_WITH)
         user.with("userId", "3333333")
         def hitSuccess = condition.matchObjects(user)
         user.with("userId", "456456")
@@ -124,7 +125,7 @@ class ConditionSpec extends Specification {
     def "[does not start with] condition match"() {
         when:
         condition.setObjects(["123", "456"])
-        condition.setPredicate("does not start with")
+        condition.setPredicate(PredicateType.DOES_NOT_START_WITH)
         user.with("userId", "3333333")
         def hitSuccess = condition.matchObjects(user)
         user.with("userId", "123456")
@@ -139,7 +140,7 @@ class ConditionSpec extends Specification {
     def "[does not contain] condition match"() {
         when:
         condition.setObjects(["12345", "987654", "665544"])
-        condition.setPredicate("does not contain")
+        condition.setPredicate(PredicateType.DOES_NOT_CONTAIN)
         user.with("userId", "999999999")
         def hitSuccess = condition.matchObjects(user)
         user.with("userId", "12345")
@@ -154,7 +155,7 @@ class ConditionSpec extends Specification {
     def "[does not match regex] condition match"() {
         when:
         condition.setObjects(["0?(13|14|15|18)[0-9]{9}"])
-        condition.setPredicate("does not match regex")
+        condition.setPredicate(PredicateType.DOES_NOT_MATCH_REGEX)
         user.with("userId", "2122121")
         def hitSuccess = condition.matchObjects(user)
         user.with("userId", "13797347245")

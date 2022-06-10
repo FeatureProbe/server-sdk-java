@@ -27,10 +27,10 @@ public final class HttpConfiguration {
     final Duration writeTimeout;
 
     protected HttpConfiguration(Builder builder) {
-        this.connectionPool = builder.connectionPool;
-        this.connectTimeout = builder.connectTimeout;
-        this.readTimeout = builder.readTimeout;
-        this.writeTimeout = builder.writeTimeout;
+        this.connectionPool = Builder.connectionPool;
+        this.connectTimeout = Builder.connectTimeout;
+        this.readTimeout = Builder.readTimeout;
+        this.writeTimeout = Builder.writeTimeout;
     }
 
     public static Builder builder() {
@@ -51,22 +51,22 @@ public final class HttpConfiguration {
         }
 
         public Builder connectionPool(ConnectionPool connectionPool) {
-            this.connectionPool = connectionPool == null ? DEFAULT_CONNECTION_POOL : connectionPool;
+            Builder.connectionPool = connectionPool == null ? DEFAULT_CONNECTION_POOL : connectionPool;
             return this;
         }
 
         public Builder connectTimeout(Duration connectTimeout) {
-            this.connectTimeout = connectTimeout == null ? DEFAULT_CONNECT_TIMEOUT : connectTimeout;
+            Builder.connectTimeout = connectTimeout == null ? DEFAULT_CONNECT_TIMEOUT : connectTimeout;
             return this;
         }
 
         public Builder readTimeout(Duration readTimeout) {
-            this.readTimeout = readTimeout == null ? DEFAULT_READ_TIMEOUT : readTimeout;
+            Builder.readTimeout = readTimeout == null ? DEFAULT_READ_TIMEOUT : readTimeout;
             return this;
         }
 
         public Builder writeTimeout(Duration writeTimeout) {
-            this.writeTimeout = writeTimeout == null ? DEFAULT_WRITE_TIMEOUT : writeTimeout;
+            Builder.writeTimeout = writeTimeout == null ? DEFAULT_WRITE_TIMEOUT : writeTimeout;
             return this;
         }
 

@@ -11,6 +11,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.slf4j.Logger;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,9 +61,7 @@ public class DefaultEventProcessor implements EventProcessor {
         eventHandleThread.setDaemon(true);
         eventHandleThread.start();
 
-        Runnable flusher = () -> {
-            flush();
-        };
+        Runnable flusher = this::flush;
         scheduler = Executors.newSingleThreadScheduledExecutor(threadFactory);
         scheduler.scheduleAtFixedRate(flusher, 0L, 5, TimeUnit.SECONDS);
     }
@@ -80,13 +79,10 @@ public class DefaultEventProcessor implements EventProcessor {
     @Override
     public void flush() {
         if (!closed.get()) {
-            if (eventQueue.offer(new EventAction(EventActionType.FLUSH, null))) {
-
-            } else {
+            if (!eventQueue.offer(new EventAction(EventActionType.FLUSH, null))) {
                 logger.warn("Event processing is busy, some will be dropped");
             }
         }
-
     }
 
     @Override
@@ -121,7 +117,7 @@ public class DefaultEventProcessor implements EventProcessor {
                     }
                 }
             } catch (Exception e) {
-                logger.error("FeatureProbe event handle error: {}", e);
+                logger.error("FeatureProbe event handle error: {}", e.getLocalizedMessage(), e);
             }
         }
     }
@@ -183,16 +179,16 @@ public class DefaultEventProcessor implements EventProcessor {
                         .post(requestBody)
                         .build();
             } catch (Exception e) {
-                logger.error("Unexpected error from event sender: {}", e.toString());
+                logger.error("Unexpected error from event sender: {}", e.getLocalizedMessage());
                 return;
             }
             try (Response response = httpClient.newCall(request).execute()) {
                 if (!response.isSuccessful()) {
-                    throw new HttpErrorException("Http request error : " + response.code());
+                    throw new HttpErrorException("Http request error: " + response.code());
                 }
-                logger.debug("Http response : " + response.toString());
+                logger.debug("Http response: {}", response);
             } catch (Exception e) {
-                logger.error("Unexpected error from event sender: {}", e.toString());
+                logger.error("Unexpected error from event sender: {}", e.getLocalizedMessage());
             }
         }
 

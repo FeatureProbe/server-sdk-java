@@ -16,16 +16,16 @@ public final class Repository {
         this.segments = segments;
     }
 
-    public Map<String, Segment> getSegments() {
-        return segments;
-    }
-
     public Map<String, Toggle> getToggles() {
         return toggles;
     }
 
     public void setToggles(Map<String, Toggle> toggles) {
         this.toggles = toggles;
+    }
+
+    public Map<String, Segment> getSegments() {
+        return segments;
     }
 
     public void setSegments(Map<String, Segment> segments) {

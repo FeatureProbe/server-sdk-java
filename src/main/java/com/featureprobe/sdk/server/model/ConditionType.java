@@ -3,19 +3,24 @@ package com.featureprobe.sdk.server.model;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public enum ConditionType {
-    STRING, SEGMENT, DATE;
+    STRING("string"),
+    SEGMENT("segment"),
+    DATE("date");
 
-    private static Map<String, ConditionType> namesMap = new HashMap<>();
+    private final String value;
 
-    static {
-        namesMap.put("string", STRING);
-        namesMap.put("segment", SEGMENT);
-        namesMap.put("date", DATE);
+    ConditionType(String value) {
+        this.value = value;
     }
+
+    private static final Map<String, ConditionType> namesMap = Arrays.stream(ConditionType.values())
+            .collect(Collectors.toMap(ct -> ct.value, ct -> ct));
 
     @JsonCreator
     public static ConditionType forValue(String value) {
@@ -24,7 +29,7 @@ public enum ConditionType {
 
     @JsonValue
     public String toValue() {
-        return namesMap.entrySet().stream().filter(e -> e.getValue() == this).findFirst()
-                .map(Map.Entry::getKey).orElse(null);
+        return value;
     }
+
 }

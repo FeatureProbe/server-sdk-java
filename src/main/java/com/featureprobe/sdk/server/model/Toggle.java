@@ -70,9 +70,7 @@ public final class Toggle {
             } else {
                 res.setValue(variation);
             }
-            if (ruleIndex.isPresent()) {
-                res.setReason("Rule " + ruleIndex.get() + " hit");
-            }
+            ruleIndex.ifPresent(idx -> res.setReason("Rule " + idx + " hit"));
         }
         return res;
     }
@@ -133,11 +131,12 @@ public final class Toggle {
         this.variations = variations;
     }
 
+    public Boolean getForClient() {
+        return forClient;
+    }
+
     public void setForClient(Boolean forClient) {
         this.forClient = forClient;
     }
 
-    public Boolean getForClient() {
-        return forClient;
-    }
 }
