@@ -44,6 +44,10 @@ public class DefaultEventProcessor implements EventProcessor {
 
     private final ExecutorService executor;
 
+    private static final String LOG_SENDER_ERROR = "Unexpected error from event sender";
+    private static final String LOG_BUSY_EVENT = "Event processing is busy, some will be dropped";
+
+
     ThreadFactory threadFactory = new ThreadFactoryBuilder()
             .setDaemon(true)
             .setNameFormat("FeatureProbe-event-handle-%d")
@@ -71,7 +75,7 @@ public class DefaultEventProcessor implements EventProcessor {
         if (!closed.get()) {
             boolean success = eventQueue.offer(new EventAction(EventActionType.EVENT, event));
             if (!success) {
-                logger.warn("Event processing is busy, some will be dropped");
+                logger.warn(LOG_BUSY_EVENT);
             }
         }
     }
@@ -80,7 +84,7 @@ public class DefaultEventProcessor implements EventProcessor {
     public void flush() {
         if (!closed.get()) {
             if (!eventQueue.offer(new EventAction(EventActionType.FLUSH, null))) {
-                logger.warn("Event processing is busy, some will be dropped");
+                logger.warn(LOG_BUSY_EVENT);
             }
         }
     }
@@ -117,7 +121,7 @@ public class DefaultEventProcessor implements EventProcessor {
                     }
                 }
             } catch (Exception e) {
-                logger.error("FeatureProbe event handle error: {}", e.getLocalizedMessage(), e);
+                logger.error("FeatureProbe event handle error", e);
             }
         }
     }
@@ -179,7 +183,7 @@ public class DefaultEventProcessor implements EventProcessor {
                         .post(requestBody)
                         .build();
             } catch (Exception e) {
-                logger.error("Unexpected error from event sender: {}", e.getLocalizedMessage());
+                logger.error(LOG_SENDER_ERROR, e);
                 return;
             }
             try (Response response = httpClient.newCall(request).execute()) {
@@ -188,7 +192,7 @@ public class DefaultEventProcessor implements EventProcessor {
                 }
                 logger.debug("Http response: {}", response);
             } catch (Exception e) {
-                logger.error("Unexpected error from event sender: {}", e.getLocalizedMessage());
+                logger.error(LOG_SENDER_ERROR, e);
             }
         }
 

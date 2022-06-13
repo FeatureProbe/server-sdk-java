@@ -92,7 +92,7 @@ final class PollingSynchronizer implements Synchronizer {
             Repository repository = mapper.readValue(body, Repository.class);
             dataRepository.refresh(repository);
         } catch (Exception e) {
-            logger.error("Unexpected error from polling processor: {}", e.toString());
+            logger.error("Unexpected error from polling processor", e);
         }
     }
 }

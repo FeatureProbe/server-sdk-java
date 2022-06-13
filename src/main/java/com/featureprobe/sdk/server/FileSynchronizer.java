@@ -33,7 +33,7 @@ final class FileSynchronizer implements Synchronizer {
         try (InputStream is = getClass().getClassLoader().getResourceAsStream(location)) {
             String data;
             if (is == null) {
-                logger.error("repository file resource not found in classpath:" + location);
+                logger.error("repository file resource not found in classpath: {}", location);
                 data = "";
             } else {
                 data = new String(ByteStreams.toByteArray(is), StandardCharsets.UTF_8);
@@ -42,7 +42,7 @@ final class FileSynchronizer implements Synchronizer {
             Repository repository = mapper.readValue(data, Repository.class);
             dataRepository.refresh(repository);
         } catch (IOException e) {
-            logger.error("repository file resource not found in classpath:" + location);
+            logger.error("repository file resource not found in classpath: {}", location, e);
         }
     }
 
