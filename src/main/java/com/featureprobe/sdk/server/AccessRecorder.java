@@ -41,7 +41,7 @@ public class AccessRecorder {
         }
 
         public void increment() {
-            count = count + 1;
+            ++count;
         }
 
         public boolean isGroup(String value, Long version, Integer index) {

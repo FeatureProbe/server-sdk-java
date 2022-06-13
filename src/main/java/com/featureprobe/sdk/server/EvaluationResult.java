@@ -27,8 +27,16 @@ public class EvaluationResult {
         return value;
     }
 
+    public void setValue(Object value) {
+        this.value = value;
+    }
+
     public Optional<Integer> getRuleIndex() {
         return ruleIndex;
+    }
+
+    public void setRuleIndex(Optional<Integer> ruleIndex) {
+        this.ruleIndex = ruleIndex;
     }
 
     public Optional<Integer> getVariationIndex() {
@@ -51,16 +59,8 @@ public class EvaluationResult {
         return reason;
     }
 
-    public void setValue(Object value) {
-        this.value = value;
-    }
-
-    public void setRuleIndex(Optional<Integer> ruleIndex) {
-        this.ruleIndex = ruleIndex;
-    }
-
-
     public void setReason(String reason) {
         this.reason = reason;
     }
+
 }

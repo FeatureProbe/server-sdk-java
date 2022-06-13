@@ -33,4 +33,5 @@ public class Segment {
     public void setRules(List<SegmentRule> rules) {
         this.rules = rules;
     }
+
 }

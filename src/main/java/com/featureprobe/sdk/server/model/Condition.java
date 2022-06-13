@@ -16,33 +16,34 @@ public final class Condition {
 
     private String subject;
 
-    private String predicate;
+    private PredicateType predicate;
 
     private List<String> objects;
 
-    private static final Map<String, Matcher> matchers = new HashMap<>(10);
+    private static final Map<PredicateType, Matcher> matchers = new HashMap<>(PredicateType.values().length);
+
 
     static {
-        matchers.put("is one of", (target, objects) ->
+        matchers.put(PredicateType.IS_ONE_OF, (target, objects) ->
                 objects.contains(target));
-        matchers.put("ends with", (target, objects) ->
-                objects.stream().filter(s -> target.endsWith(s)).findAny().isPresent());
-        matchers.put("starts with", (target, objects) ->
-                objects.stream().filter(s -> target.startsWith(s)).findAny().isPresent());
-        matchers.put("contains", (target, objects) ->
-                objects.stream().filter(s -> target.indexOf(s) != -1).findAny().isPresent());
-        matchers.put("matches regex", (target, objects) ->
-                objects.stream().filter(s -> Pattern.compile(s).matcher(target).find()).findAny().isPresent());
-        matchers.put("is not any of", (target, objects) ->
+        matchers.put(PredicateType.ENDS_WITH, (target, objects) ->
+                objects.stream().anyMatch(target::endsWith));
+        matchers.put(PredicateType.STARTS_WITH, (target, objects) ->
+                objects.stream().anyMatch(target::startsWith));
+        matchers.put(PredicateType.CONTAINS, (target, objects) ->
+                objects.stream().anyMatch(target::contains));
+        matchers.put(PredicateType.MATCHES_REGEX, (target, objects) ->
+                objects.stream().anyMatch(s -> Pattern.compile(s).matcher(target).find()));
+        matchers.put(PredicateType.IS_NOT_ANY_OF, (target, objects) ->
                 !objects.contains(target));
-        matchers.put("does not end with", (target, objects) ->
-                !objects.stream().filter(s -> target.endsWith(s)).findAny().isPresent());
-        matchers.put("does not start with", (target, objects) ->
-                !objects.stream().filter(s -> target.startsWith(s)).findAny().isPresent());
-        matchers.put("does not contain", (target, objects) ->
-                !objects.stream().filter(s -> target.indexOf(s) != -1).findAny().isPresent());
-        matchers.put("does not match regex", (target, objects) ->
-                !objects.stream().filter(s -> Pattern.compile(s).matcher(target).find()).findAny().isPresent());
+        matchers.put(PredicateType.DOES_NOT_END_WITH, (target, objects) ->
+                objects.stream().noneMatch(target::endsWith));
+        matchers.put(PredicateType.DOES_NOT_START_WITH, (target, objects) ->
+                objects.stream().noneMatch(target::startsWith));
+        matchers.put(PredicateType.DOES_NOT_CONTAIN, (target, objects) ->
+                objects.stream().noneMatch(target::contains));
+        matchers.put(PredicateType.DOES_NOT_MATCH_REGEX, (target, objects) ->
+                objects.stream().noneMatch(s -> Pattern.compile(s).matcher(target).find()));
     }
 
     public boolean matchObjects(FPUser user) {
@@ -87,10 +88,10 @@ public final class Condition {
     }
 
     public String getPredicate() {
-        return predicate;
+        return Objects.isNull(predicate) ? null : predicate.toValue();
     }
 
-    public void setPredicate(String predicate) {
+    public void setPredicate(PredicateType predicate) {
         this.predicate = predicate;
     }
 

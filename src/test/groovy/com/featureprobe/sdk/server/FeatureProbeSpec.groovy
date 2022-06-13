@@ -22,6 +22,30 @@ class FeatureProbeSpec extends Specification {
         testCase = mapper.readTree(data)
     }
 
+    def "FeatureProbe initialized with empty sdkKey"() {
+        expect:
+        try {
+            featureProbe = new FeatureProbe("")
+            fail("should not allow empty sdk key")
+        } catch (Exception e) {
+            assert e instanceof IllegalArgumentException
+        }
+
+        try {
+            featureProbe = new FeatureProbe(" \n\t  ")
+            fail("should not allow empty sdk key")
+        } catch (Exception e) {
+            assert e instanceof IllegalArgumentException
+        }
+
+        try {
+            featureProbe = new FeatureProbe("foo")
+        } catch (Exception ignored) {
+            fail("ctor should not fail with not empty sdk key")
+        }
+    }
+
+
     def "FeatureProbe case test"() {
         when:
         def tests = testCase.get("tests").asList()

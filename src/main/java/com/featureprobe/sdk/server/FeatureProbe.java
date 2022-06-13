@@ -14,7 +14,13 @@ public final class FeatureProbe {
 
     private static final Logger logger = Loggers.MAIN;
 
-    private ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper();
+
+    private static final String REASON_TYPE_MISMATCH = "Toggle data type mismatch";
+    private static final String REASON_HANDLE_ERROR = "FeatureProbe handle error";
+
+    private static final String LOG_HANDLE_ERROR = "FeatureProbe handle error. toggleKey: {}";
+    private static final String LOG_CONVERSION_ERROR = "Toggle data type conversion error. toggleKey: {}";
 
     @VisibleForTesting
     final DataRepository dataRepository;
@@ -36,7 +42,7 @@ public final class FeatureProbe {
 
     public FeatureProbe(String sdkKey, FPConfig config) {
         if (StringUtils.isBlank(sdkKey)) {
-            throw new NullPointerException("sdkKey must not be blank");
+            throw new IllegalArgumentException("sdkKey must not be blank");
         }
         final FPContext context = new FPContext(sdkKey, config);
         eventProcessor = config.eventProcessorFactory.createEventProcessor(context);
@@ -45,7 +51,7 @@ public final class FeatureProbe {
     }
 
     public boolean boolValue(String toggleKey, FPUser user, boolean defaultValue) {
-        return genericEvaluate(toggleKey, user, defaultValue, Boolean.class).booleanValue();
+        return genericEvaluate(toggleKey, user, defaultValue, Boolean.class);
     }
 
     public String stringValue(String toggleKey, FPUser user, String defaultValue) {
@@ -53,7 +59,7 @@ public final class FeatureProbe {
     }
 
     public double numberValue(String toggleKey, FPUser user, double defaultValue) {
-        return genericEvaluate(toggleKey, user, defaultValue, Double.class).doubleValue();
+        return genericEvaluate(toggleKey, user, defaultValue, Double.class);
     }
 
     public <T> T jsonValue(String toggleKey, FPUser user, T defaultValue, Class<T> clazz) {
@@ -93,16 +99,15 @@ public final class FeatureProbe {
                 return mapper.readValue(value, clazz);
             }
         } catch (JsonProcessingException e) {
-            logger.error("Toggle data type conversion error。toggleKey: {}", toggleKey, e);
+            logger.error(LOG_CONVERSION_ERROR, toggleKey, e);
         } catch (Exception e) {
-            logger.error("FeatureProbe handle error. toggleKey: {}", toggleKey, e);
+            logger.error(LOG_HANDLE_ERROR, toggleKey, e);
         }
         return defaultValue;
     }
 
     private <T> T genericEvaluate(String toggleKey, FPUser user, T defaultValue, Class<T> clazz) {
         try {
-
             Toggle toggle = dataRepository.getToggle(toggleKey);
             if (Objects.nonNull(toggle)) {
                 EvaluationResult evalResult = toggle.eval(user, defaultValue);
@@ -113,9 +118,9 @@ public final class FeatureProbe {
                 return clazz.cast(evalResult.getValue());
             }
         } catch (ClassCastException e) {
-            logger.error("Toggle data type conversion error。toggleKey: {}", toggleKey, e);
+            logger.error(LOG_CONVERSION_ERROR, toggleKey, e);
         } catch (Exception e) {
-            logger.error("FeatureProbe handle error. toggleKey: {}", toggleKey, e);
+            logger.error(LOG_HANDLE_ERROR, toggleKey, e);
         }
         return defaultValue;
     }
@@ -125,11 +130,11 @@ public final class FeatureProbe {
         try {
             return getEvaluateDetail(toggleKey, user, defaultValue, clazz, true);
         } catch (ClassCastException | JsonProcessingException e) {
-            logger.error("Toggle data type conversion error. toggleKey: {}", toggleKey, e);
-            detail.setReason("Toggle data type mismatch");
+            logger.error(LOG_CONVERSION_ERROR, toggleKey, e);
+            detail.setReason(REASON_TYPE_MISMATCH);
         } catch (Exception e) {
-            logger.error("FeatureProbe handle error. toggleKey: {}", toggleKey, e);
-            detail.setReason("FeatureProbe handle error");
+            logger.error(LOG_HANDLE_ERROR, toggleKey, e);
+            detail.setReason(REASON_HANDLE_ERROR);
         }
         detail.setValue(defaultValue);
         return detail;
@@ -140,11 +145,11 @@ public final class FeatureProbe {
         try {
             return getEvaluateDetail(toggleKey, user, defaultValue, clazz, false);
         } catch (ClassCastException | JsonProcessingException e) {
-            logger.error("Toggle data type conversion error. toggleKey: {}", toggleKey, e);
-            detail.setReason("Toggle data type mismatch");
+            logger.error(LOG_CONVERSION_ERROR, toggleKey, e);
+            detail.setReason(REASON_TYPE_MISMATCH);
         } catch (Exception e) {
-            logger.error("FeatureProbe handle error. toggleKey: {}", toggleKey, e);
-            detail.setReason("FeatureProbe handle error");
+            logger.error(LOG_HANDLE_ERROR, toggleKey, e);
+            detail.setReason(REASON_HANDLE_ERROR);
         }
         detail.setValue(defaultValue);
         return detail;

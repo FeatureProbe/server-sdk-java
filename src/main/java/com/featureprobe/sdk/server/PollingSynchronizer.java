@@ -54,7 +54,7 @@ final class PollingSynchronizer implements Synchronizer {
 
     @Override
     public void sync() {
-        logger.info("starting FeatureProbe polling repository with interval: " + refreshInterval.toMillis() + "ms");
+        logger.info("starting FeatureProbe polling repository with interval {} ms", refreshInterval.toMillis());
         poll();
         synchronized (this) {
             if (worker == null) {
@@ -84,15 +84,15 @@ final class PollingSynchronizer implements Synchronizer {
         try (Response response = httpClient.newCall(request).execute()) {
             String body = response.body().string();
             if (!response.isSuccessful()) {
-                throw new HttpErrorException("Http request error : " + response.code());
+                throw new HttpErrorException("Http request error: " + response.code());
             }
-            logger.debug("Http response : " + response.toString());
-            logger.debug("Http response body : " + body);
+            logger.debug("Http response: {}", response);
+            logger.debug("Http response body: {}", body);
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             Repository repository = mapper.readValue(body, Repository.class);
             dataRepository.refresh(repository);
         } catch (Exception e) {
-            logger.error("Unexpected error from polling processor: {}", e.toString());
+            logger.error("Unexpected error from polling processor", e);
         }
     }
 }

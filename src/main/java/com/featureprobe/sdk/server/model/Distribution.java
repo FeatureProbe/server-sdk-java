@@ -10,4 +10,5 @@ public final class Distribution {
     public List<List<Integer>> getDistribution() {
         return distribution;
     }
+
 }

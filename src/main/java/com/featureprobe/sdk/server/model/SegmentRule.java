@@ -13,4 +13,5 @@ public class SegmentRule {
     public void setConditions(List<Condition> conditions) {
         this.conditions = conditions;
     }
+
 }

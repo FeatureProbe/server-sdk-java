@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -41,13 +42,13 @@ public class Split {
                 hashKey = user.getAttrs().get(bucketBy);
             } else {
                 return new HitResult(false,
-                        Optional.of("Warning : User with key : " + user.getKey()
-                                + " does not have attribute name: " + bucketBy));
+                        Optional.of(String.format("Warning: User with key '%s' does not have attribute name '%s'",
+                                user.getKey(), bucketBy)));
             }
         }
         int groupIndex = getGroup(hash(hashKey, getHashSalt(toggleKey), BUCKET_SIZE));
         return new HitResult(true, Optional.of(groupIndex),
-                Optional.of(" selected " + groupIndex + " percentage group"));
+                Optional.of(String.format("selected %d percentage group", groupIndex)));
     }
 
     @VisibleForTesting
@@ -69,12 +70,10 @@ public class Split {
         MessageDigest messageDigest;
         try {
             messageDigest = MessageDigest.getInstance("SHA-1");
-            messageDigest.update(value.getBytes("UTF-8"));
+            messageDigest.update(value.getBytes(StandardCharsets.UTF_8));
             hashValue = messageDigest.digest();
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("couldn't clone MessageDigest object", e);
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("couldn't encode member_id as UTF8", e);
         }
         byte[] bytes = Arrays.copyOfRange(hashValue, hashValue.length - 4, hashValue.length);
         return new BigInteger(1, bytes).mod(BigInteger.valueOf(bucketSize)).intValue();
@@ -107,4 +106,5 @@ public class Split {
     public void setSalt(String salt) {
         this.salt = salt;
     }
+
 }
