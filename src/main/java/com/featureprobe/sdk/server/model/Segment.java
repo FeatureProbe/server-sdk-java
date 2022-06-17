@@ -1,6 +1,10 @@
 package com.featureprobe.sdk.server.model;
 
+import com.featureprobe.sdk.server.FPUser;
+import com.featureprobe.sdk.server.HitResult;
+
 import java.util.List;
+import java.util.Map;
 
 public class Segment {
 
@@ -9,6 +13,16 @@ public class Segment {
     private Long version;
 
     private List<SegmentRule> rules;
+
+    public boolean contains(FPUser user, Map<String, Segment> segments) {
+        for (SegmentRule rule : rules) {
+            HitResult hitResult = rule.hit(user, segments);
+            if (hitResult.isHit()) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public String getUniqueId() {
         return uniqueId;

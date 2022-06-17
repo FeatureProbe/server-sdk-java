@@ -13,12 +13,15 @@ public enum PredicateType {
     STARTS_WITH("starts with"),
     CONTAINS("contains"),
     MATCHES_REGEX("matches regex"),
-
     IS_NOT_ANY_OF("is not any of"),
     DOES_NOT_END_WITH("does not end with"),
     DOES_NOT_START_WITH("does not start with"),
     DOES_NOT_CONTAIN("does not contain"),
-    DOES_NOT_MATCH_REGEX("does not match regex");
+    DOES_NOT_MATCH_REGEX("does not match regex"),
+
+    IS_IN("is in"),
+    IS_NOT_IN("is not in");
+
 
     private final String value;
 
