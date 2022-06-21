@@ -11,6 +11,12 @@ public class SegmentRule {
 
     private List<Condition> conditions;
 
+    public SegmentRule(){}
+
+    public SegmentRule(List<Condition> conditions) {
+        this.conditions = conditions;
+    }
+
     public HitResult hit(FPUser user, Map<String, Segment> segments) {
         for (Condition condition : conditions) {
             if (condition.getType() != ConditionType.SEGMENT && !user.containAttr(condition.getSubject())) {
