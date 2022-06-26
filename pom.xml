@@ -45,6 +45,7 @@
         <version.logback>1.2.11</version.logback>
         <version.jackson>2.13.3</version.jackson>
         <version.commons>3.11</version.commons>
+        <version.maven-artifact>3.8.5</version.maven-artifact>
         <groovy.version>3.0.9</groovy.version>
     </properties>
 
@@ -90,6 +91,11 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>${version.jackson}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-artifact</artifactId>
+            <version>${version.maven-artifact}</version>
         </dependency>
 
         <dependency>

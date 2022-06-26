@@ -2,7 +2,6 @@ package com.featureprobe.sdk.server.model;
 
 import com.featureprobe.sdk.server.FPUser;
 import com.featureprobe.sdk.server.HitResult;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Map;
