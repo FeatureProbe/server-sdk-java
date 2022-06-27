@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public enum PredicateType {
+  
     IS_ONE_OF("is one of"),
     ENDS_WITH("ends with"),
     STARTS_WITH("starts with"),
