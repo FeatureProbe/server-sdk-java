@@ -4,14 +4,15 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public enum ConditionType {
     STRING("string"),
     SEGMENT("segment"),
-    DATE("date");
+    DATETIME("datetime"),
+    NUMBER("number"),
+    SEM_VER("semver");
 
     private final String value;
 

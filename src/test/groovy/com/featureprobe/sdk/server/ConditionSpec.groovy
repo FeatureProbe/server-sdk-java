@@ -24,7 +24,7 @@ class ConditionSpec extends Specification {
                         predicate: PredicateType.IS_ONE_OF, objects: ["1", "2"])])])]
     }
 
-    def "[is one of] condition match"() {
+    def "[is one of] string condition match"() {
         when:
         condition.setObjects(["12345", "987654", "665544", "13797347245"])
         condition.setPredicate(PredicateType.IS_ONE_OF)
@@ -39,7 +39,7 @@ class ConditionSpec extends Specification {
         }
     }
 
-    def "[ends with] condition match"() {
+    def "[ends with] sting condition match"() {
         when:
         condition.setObjects(["123", "888"])
         condition.setPredicate(PredicateType.ENDS_WITH)
@@ -54,7 +54,7 @@ class ConditionSpec extends Specification {
         }
     }
 
-    def "[starts with] condition match"() {
+    def "[starts with] string condition match"() {
         when:
         condition.setObjects(["123"])
         condition.setPredicate(PredicateType.STARTS_WITH)
@@ -69,7 +69,7 @@ class ConditionSpec extends Specification {
         }
     }
 
-    def "[contains] condition match"() {
+    def "[contains] string condition match"() {
         when:
         condition.setObjects(["123", "456"])
         condition.setPredicate(PredicateType.CONTAINS)
@@ -84,7 +84,7 @@ class ConditionSpec extends Specification {
         }
     }
 
-    def "[matches regex] condition match"() {
+    def "[matches regex] string condition match"() {
         when:
         condition.setObjects(["0?(13|14|15|18)[0-9]{9}"])
         condition.setPredicate(PredicateType.MATCHES_REGEX)
@@ -99,7 +99,7 @@ class ConditionSpec extends Specification {
         }
     }
 
-    def "[is not any of] condition match"() {
+    def "[is not any of] string condition match"() {
         when:
         condition.setObjects(["12345", "987654", "665544"])
         condition.setPredicate(PredicateType.IS_NOT_ANY_OF)
@@ -114,7 +114,7 @@ class ConditionSpec extends Specification {
         }
     }
 
-    def "[does not end with] condition match"() {
+    def "[does not end with] string condition match"() {
         when:
         condition.setObjects(["123", "456"])
         condition.setPredicate(PredicateType.DOES_NOT_END_WITH)
@@ -129,7 +129,7 @@ class ConditionSpec extends Specification {
         }
     }
 
-    def "[does not start with] condition match"() {
+    def "[does not start with] string condition match"() {
         when:
         condition.setObjects(["123", "456"])
         condition.setPredicate(PredicateType.DOES_NOT_START_WITH)
@@ -144,7 +144,7 @@ class ConditionSpec extends Specification {
         }
     }
 
-    def "[does not contain] condition match"() {
+    def "[does not contain] string condition match"() {
         when:
         condition.setObjects(["12345", "987654", "665544"])
         condition.setPredicate(PredicateType.DOES_NOT_CONTAIN)
@@ -159,7 +159,7 @@ class ConditionSpec extends Specification {
         }
     }
 
-    def "[does not match regex] condition match"() {
+    def "[does not match regex] string condition match"() {
         when:
         condition.setObjects(["0?(13|14|15|18)[0-9]{9}"])
         condition.setPredicate(PredicateType.DOES_NOT_MATCH_REGEX)
@@ -174,7 +174,7 @@ class ConditionSpec extends Specification {
         }
     }
 
-    def "[is in segment] condition match" () {
+    def "[is in] segment condition match"() {
         when:
         condition.setType(ConditionType.SEGMENT)
         condition.setObjects(["test_project\$test_segment"])
@@ -188,7 +188,7 @@ class ConditionSpec extends Specification {
         !hitMiss
     }
 
-    def "[Is not in segment] condition match" () {
+    def "[Is not in] segment condition match"() {
         when:
         condition.setType(ConditionType.SEGMENT)
         condition.setObjects(["test_project\$test_segment"])
@@ -202,5 +202,325 @@ class ConditionSpec extends Specification {
         !hitMiss
     }
 
+    def "[equal to] number condition match"() {
+        when:
+        condition.setType(ConditionType.NUMBER)
+        condition.setObjects(["10", "20"])
+        condition.setSubject("age")
+        condition.setPredicate(PredicateType.EQUAL_TO)
+        user.with("age", "10")
+        def hitSuccess = condition.matchObjects(user, segments)
+        user.with("age", "11")
+        def hitMiss1 = condition.matchObjects(user, segments)
+        user.with("age", "abc")
+        def hitMiss2 = condition.matchObjects(user, segments)
+        then:
+        hitSuccess
+        !hitMiss1
+        !hitMiss2
+    }
+
+    def "[not equal to] number condition match"() {
+        when:
+        condition.setType(ConditionType.NUMBER)
+        condition.setObjects(["10", "20"])
+        condition.setSubject("age")
+        condition.setPredicate(PredicateType.NOT_EQUAL_TO)
+        user.with("age", "11")
+        def hitSuccess = condition.matchObjects(user, segments)
+        user.with("age", "20")
+        def hitMiss1 = condition.matchObjects(user, segments)
+        user.with("age", "abc")
+        def hitMiss2 = condition.matchObjects(user, segments)
+        then:
+        hitSuccess
+        !hitMiss1
+        !hitMiss2
+    }
+
+    def "[less than] number condition match"() {
+        when:
+        condition.setType(ConditionType.NUMBER)
+        condition.setObjects(["10", "20"])
+        condition.setSubject("age")
+        condition.setPredicate(PredicateType.LESS_THAN)
+        user.with("age", "9")
+        def hitSuccess1 = condition.matchObjects(user, segments)
+        user.with("age", "15")
+        def hitSuccess2 = condition.matchObjects(user, segments)
+        user.with("age", "20")
+        def hitMiss1 = condition.matchObjects(user, segments)
+        user.with("age", "25")
+        def hitMiss2 = condition.matchObjects(user, segments)
+        user.with("age", "abc")
+        def hitMiss3 = condition.matchObjects(user, segments)
+        then:
+        hitSuccess1
+        hitSuccess2
+        !hitMiss1
+        !hitMiss2
+        !hitMiss3
+    }
+
+    def "[less than or equal to] number condition match"() {
+        when:
+        condition.setType(ConditionType.NUMBER)
+        condition.setObjects(["10", "20"])
+        condition.setSubject("age")
+        condition.setPredicate(PredicateType.LESS_THAN_OR_EQUAL_TO)
+        user.with("age", "9")
+        def hitSuccess1 = condition.matchObjects(user, segments)
+        user.with("age", "10")
+        def hitSuccess2 = condition.matchObjects(user, segments)
+        user.with("age", "15")
+        def hitSuccess3 = condition.matchObjects(user, segments)
+        user.with("age", "25")
+        def hitMiss1 = condition.matchObjects(user, segments)
+        user.with("age", "abc")
+        def hitMiss2 = condition.matchObjects(user, segments)
+        then:
+        hitSuccess1
+        hitSuccess2
+        hitSuccess3
+        !hitMiss1
+        !hitMiss2
+    }
+
+    def "[greater than] number condition match"() {
+        when:
+        condition.setType(ConditionType.NUMBER)
+        condition.setObjects(["10", "20"])
+        condition.setSubject("age")
+        condition.setPredicate(PredicateType.GREATER_THAN)
+        user.with("age", "15")
+        def hitSuccess1 = condition.matchObjects(user, segments)
+        user.with("age", "25")
+        def hitSuccess2 = condition.matchObjects(user, segments)
+        user.with("age", "10")
+        def hitMiss1 = condition.matchObjects(user, segments)
+        user.with("age", "9")
+        def hitMiss2 = condition.matchObjects(user, segments)
+        user.with("age", "abc")
+        def hitMiss3 = condition.matchObjects(user, segments)
+        then:
+        hitSuccess1
+        hitSuccess2
+        !hitMiss1
+        !hitMiss2
+        !hitMiss3
+    }
+
+    def "[greater than or equal to] number condition match"() {
+        when:
+        condition.setType(ConditionType.NUMBER)
+        condition.setObjects(["10", "20"])
+        condition.setSubject("age")
+        condition.setPredicate(PredicateType.GREATER_THAN_OR_EQUAL_TO)
+        user.with("age", "15")
+        def hitSuccess1 = condition.matchObjects(user, segments)
+        user.with("age", "20")
+        def hitSuccess2 = condition.matchObjects(user, segments)
+        user.with("age", "25")
+        def hitSuccess3 = condition.matchObjects(user, segments)
+        user.with("age", "9")
+        def hitMiss1 = condition.matchObjects(user, segments)
+        user.with("age", "abc")
+        def hitMiss2 = condition.matchObjects(user, segments)
+        then:
+        hitSuccess1
+        hitSuccess2
+        hitSuccess3
+        !hitMiss1
+        !hitMiss2
+    }
+
+    def "[before] datetime condition match"() {
+        when:
+        condition.setType(ConditionType.DATETIME)
+        condition.setObjects(["1656217309", "1656303709"])
+        condition.setSubject("loginTime")
+        condition.setPredicate(PredicateType.BEFORE)
+        user.with("loginTime", "1656130909")
+        def hitSuccess1 = condition.matchObjects(user, segments)
+        user.with("loginTime", "1656217309")
+        def hitSuccess2 = condition.matchObjects(user, segments)
+        user.with("loginTime", "1656303709")
+        def hitMiss1 = condition.matchObjects(user, segments)
+        user.with("loginTime", "1656498109")
+        def hitMiss2 = condition.matchObjects(user, segments)
+        user.with("loginTime", "")
+        def hitMiss3 = condition.matchObjects(user, segments)
+        user.with("loginTime", "abc")
+        def hitMiss4 = condition.matchObjects(user, segments)
+        then:
+        hitSuccess1
+        hitSuccess2
+        !hitMiss1
+        !hitMiss2
+        !hitMiss3
+        !hitMiss4
+    }
+
+    def "[after] datetime condition match"() {
+        when:
+        condition.setType(ConditionType.DATETIME)
+        condition.setObjects(["1656217309", "1656303709"])
+        condition.setSubject("loginTime")
+        condition.setPredicate(PredicateType.AFTER)
+        user.with("loginTime", "1656217309")
+        def hitSuccess1 = condition.matchObjects(user, segments)
+        user.with("loginTime", "1656257309")
+        def hitSuccess2 = condition.matchObjects(user, segments)
+        user.with("loginTime", "1656303709")
+        def hitSuccess3 = condition.matchObjects(user, segments)
+        user.with("loginTime", "")
+        def hitSuccess4 = condition.matchObjects(user, segments)
+        user.with("loginTime", "1656117309")
+        def hitMiss1 = condition.matchObjects(user, segments)
+        user.with("loginTime", "abc")
+        def hitMiss2 = condition.matchObjects(user, segments)
+        then:
+        hitSuccess1
+        hitSuccess2
+        hitSuccess3
+        hitSuccess4
+        !hitMiss1
+        !hitMiss2
+    }
+
+    def "[equal to] SemanticVersion condition match"() {
+        when:
+        condition.setType(ConditionType.SEM_VER)
+        condition.setObjects(["1.1.1", "2.1.1"])
+        condition.setSubject("version")
+        condition.setPredicate(PredicateType.EQUAL_TO)
+        user.with("version", "1.1.1")
+        def hitSuccess1 = condition.matchObjects(user, segments)
+        user.with("version", "1.1.2")
+        def hitMiss1 = condition.matchObjects(user, segments)
+        user.with("version", "1.1.1-RELEASE")
+        def hitMiss2 = condition.matchObjects(user, segments)
+        then:
+        hitSuccess1
+        !hitMiss1
+        !hitMiss2
+    }
+
+    def "[not equal to] SemanticVersion condition match"() {
+        when:
+        condition.setType(ConditionType.SEM_VER)
+        condition.setObjects(["1.1.1", "2.1.1"])
+        condition.setSubject("version")
+        condition.setPredicate(PredicateType.NOT_EQUAL_TO)
+        user.with("version", "1.1.2")
+        def hitSuccess1 = condition.matchObjects(user, segments)
+        user.with("version", "1.1.1")
+        def hitMiss1 = condition.matchObjects(user, segments)
+        user.with("version", "1.1.1-RELEASE")
+        def hitMiss2 = condition.matchObjects(user, segments)
+        then:
+        hitSuccess1
+        !hitMiss1
+        !hitMiss2
+    }
+
+    def "[less than] SemanticVersion condition match"() {
+        when:
+        condition.setType(ConditionType.SEM_VER)
+        condition.setObjects(["1.1.1", "2.1.1"])
+        condition.setSubject("version")
+        condition.setPredicate(PredicateType.LESS_THAN)
+        user.with("version", "1.1.0")
+        def hitSuccess1 = condition.matchObjects(user, segments)
+        user.with("version", "1.1.2")
+        def hitSuccess2 = condition.matchObjects(user, segments)
+        user.with("version", "2.1.1")
+        def hitMiss1 = condition.matchObjects(user, segments)
+        user.with("version", "3.1.1")
+        def hitMiss2 = condition.matchObjects(user, segments)
+        user.with("version", "1.1.1-RELEASE")
+        def hitMiss3 = condition.matchObjects(user, segments)
+        then:
+        hitSuccess1
+        hitSuccess2
+        !hitMiss1
+        !hitMiss2
+        !hitMiss3
+    }
+
+    def "[less than or equal to] SemanticVersion condition match"() {
+        when:
+        condition.setType(ConditionType.SEM_VER)
+        condition.setObjects(["1.1.1", "2.1.1"])
+        condition.setSubject("version")
+        condition.setPredicate(PredicateType.LESS_THAN_OR_EQUAL_TO)
+        user.with("version", "1.1.0")
+        def hitSuccess1 = condition.matchObjects(user, segments)
+        user.with("version", "1.1.1")
+        def hitSuccess2 = condition.matchObjects(user, segments)
+        user.with("version", "2.1.1")
+        def hitSuccess3 = condition.matchObjects(user, segments)
+        user.with("version", "3.1.1")
+        def hitMiss1 = condition.matchObjects(user, segments)
+        user.with("version", "1.1.1-RELEASE")
+        def hitMiss2 = condition.matchObjects(user, segments)
+        then:
+        hitSuccess1
+        hitSuccess2
+        hitSuccess3
+        !hitMiss1
+        !hitMiss2
+    }
+
+    def "[greater than] SemanticVersion condition match"() {
+        when:
+        condition.setType(ConditionType.SEM_VER)
+        condition.setObjects(["1.1.1", "2.1.1"])
+        condition.setSubject("version")
+        condition.setPredicate(PredicateType.GREATER_THAN)
+        user.with("version", "1.1.2")
+        def hitSuccess1 = condition.matchObjects(user, segments)
+        user.with("version", "2.1.1")
+        def hitSuccess2 = condition.matchObjects(user, segments)
+        user.with("version", "3.3.1")
+        def hitSuccess3 = condition.matchObjects(user, segments)
+        user.with("version", "1.1.0")
+        def hitMiss1 = condition.matchObjects(user, segments)
+        user.with("version", "1.1.1")
+        def hitMiss2 = condition.matchObjects(user, segments)
+        user.with("version", "1.1.1-RELEASE")
+        def hitMiss3 = condition.matchObjects(user, segments)
+        then:
+        hitSuccess1
+        hitSuccess2
+        hitSuccess3
+        !hitMiss1
+        !hitMiss2
+        !hitMiss3
+    }
+
+    def "[greater than or equal to] SemanticVersion condition match"() {
+        when:
+        condition.setType(ConditionType.SEM_VER)
+        condition.setObjects(["1.1.1", "2.1.1"])
+        condition.setSubject("version")
+        condition.setPredicate(PredicateType.GREATER_THAN_OR_EQUAL_TO)
+        user.with("version", "1.1.1")
+        def hitSuccess1 = condition.matchObjects(user, segments)
+        user.with("version", "2.1.1")
+        def hitSuccess2 = condition.matchObjects(user, segments)
+        user.with("version", "3.3.1")
+        def hitSuccess3 = condition.matchObjects(user, segments)
+        user.with("version", "1.1.0")
+        def hitMiss1 = condition.matchObjects(user, segments)
+        user.with("version", "1.1.1-RELEASE")
+        def hitMiss2 = condition.matchObjects(user, segments)
+        then:
+        hitSuccess1
+        hitSuccess2
+        hitSuccess3
+        !hitMiss1
+        !hitMiss2
+    }
 }
 
