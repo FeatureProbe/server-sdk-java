@@ -240,17 +240,20 @@ class ConditionSpec extends Specification {
     def "[=] number condition match"() {
         when:
         condition.setType(ConditionType.NUMBER)
-        condition.setObjects(["12"])
-        condition.setPredicate(PredicateType.EQUAL)
+        condition.setObjects(["12", "10.1"])
+        condition.setPredicate(PredicateType.EQUAL_TO)
         user.with("userId", "  12.000000 \n")
-        def hitSuccess = condition.matchObjects(user, segments)
+        def hitSuccess1 = condition.matchObjects(user, segments)
+        user.with("userId", "  10.10 \n")
+        def hitSuccess2 = condition.matchObjects(user, segments)
         user.with("userId", "foo.bar+1")
         def hitMiss1 = condition.matchObjects(user, segments)
         user.with("userId", " ")
         def hitMiss2 = condition.matchObjects(user, segments)
 
         then:
-        hitSuccess
+        hitSuccess1
+        hitSuccess2
         !hitMiss1
         !hitMiss2
     }
@@ -259,15 +262,23 @@ class ConditionSpec extends Specification {
         when:
         condition.setType(ConditionType.NUMBER)
         condition.setObjects(["12", "16"])
-        condition.setPredicate(PredicateType.NOT_EQUAL)
+        condition.setPredicate(PredicateType.NOT_EQUAL_TO)
         user.with("userId", "  13 \n")
         def hitSuccess = condition.matchObjects(user, segments)
         user.with("userId", "\t16.0 ")
-        def hitMiss = condition.matchObjects(user, segments)
+        def hitMiss1 = condition.matchObjects(user, segments)
+        user.with("userId", "foo")
+        def hitMiss2 = condition.matchObjects(user, segments)
+
+        condition.setObjects(["foo", "16"])
+        user.with("userId", "1")
+        def hitMiss3 = condition.matchObjects(user, segments)
 
         then:
         hitSuccess
-        !hitMiss
+        !hitMiss1
+        !hitMiss2
+        !hitMiss3
     }
 
     def "[>] number condition match"() {
@@ -297,7 +308,6 @@ class ConditionSpec extends Specification {
         def hitSuccess1 = condition.matchObjects(user, segments)
         user.with("userId", "\t12.0 ")
         def hitSuccess2 = condition.matchObjects(user, segments)
-        // note that float (32-bit) has limited precision
         user.with("userId", "\t11.919999998 ")
         def hitMiss = condition.matchObjects(user, segments)
 
@@ -347,7 +357,7 @@ class ConditionSpec extends Specification {
         when:
         condition.setType(ConditionType.SEMVER)
         condition.setObjects(["1.1.3", "1.1.5"])
-        condition.setPredicate(PredicateType.EQUAL)
+        condition.setPredicate(PredicateType.EQUAL_TO)
         user.with("userId", "1.1.3")
         def hitSuccess1 = condition.matchObjects(user, segments)
         user.with("userId", "1.1.5")
@@ -368,7 +378,7 @@ class ConditionSpec extends Specification {
         when:
         condition.setType(ConditionType.SEMVER)
         condition.setObjects(["1.1.0", "1.2.0"])
-        condition.setPredicate(PredicateType.NOT_EQUAL)
+        condition.setPredicate(PredicateType.NOT_EQUAL_TO)
         user.with("userId", "1.3.0")
         def hitSuccess = condition.matchObjects(user, segments)
         user.with("userId", "1.1.0")

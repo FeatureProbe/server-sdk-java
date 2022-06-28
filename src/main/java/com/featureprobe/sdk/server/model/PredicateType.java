@@ -38,8 +38,8 @@ public enum PredicateType {
     // number predicates
     // semver predicates
 
-    EQUAL("="),
-    NOT_EQUAL("!="),
+    EQUAL_TO("="),
+    NOT_EQUAL_TO("!="),
     GREATER_THAN(">"),
     GREATER_OR_EQUAL(">="),
     LESS_THAN("<"),

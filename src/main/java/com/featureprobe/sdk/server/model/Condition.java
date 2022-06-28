@@ -3,11 +3,14 @@ package com.featureprobe.sdk.server.model;
 import com.featureprobe.sdk.server.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.versioning.ComparableVersion;
+import org.slf4j.Logger;
 
 import java.util.*;
 import java.util.regex.Pattern;
 
 public final class Condition {
+
+    private static final Logger logger = Loggers.EVALUATOR;
 
     private ConditionType type;
 
@@ -57,45 +60,43 @@ public final class Condition {
         segmentMatchers.put(PredicateType.IS_NOT_IN, (user, segments, objects) ->
                 objects.stream().noneMatch(s -> segments.get(s).contains(user, segments)));
 
-        datetimeMatchers.put(PredicateType.AFTER, ((target, customValue) -> customValue >= target));
-        datetimeMatchers.put(PredicateType.BEFORE, ((target, customValue) -> customValue < target));
+        datetimeMatchers.put(PredicateType.AFTER, ((target, objects) ->
+                objects.stream().map(Long::parseLong).anyMatch(o -> target >= o)));
+        datetimeMatchers.put(PredicateType.BEFORE, ((target, objects) ->
+                objects.stream().map(Long::parseLong).anyMatch(o -> target < o)));
 
-        numberMatchers.put(PredicateType.EQUAL, ((customValue, objects) ->
-                objects.stream().map(Float::parseFloat).anyMatch(o -> customValue == o)));
-        numberMatchers.put(PredicateType.NOT_EQUAL, ((customValue, objects) ->
-                objects.stream().map(Float::parseFloat).noneMatch(o -> customValue == o)));
-        numberMatchers.put(PredicateType.GREATER_THAN, ((customValue, objects) ->
-                objects.stream().map(Float::parseFloat).anyMatch(o -> customValue > o)));
-        numberMatchers.put(PredicateType.GREATER_OR_EQUAL, ((customValue, objects) ->
-                objects.stream().map(Float::parseFloat).anyMatch(o -> customValue >= o)));
-        numberMatchers.put(PredicateType.LESS_THAN, ((customValue, objects) ->
-                objects.stream().map(Float::parseFloat).anyMatch(o -> customValue < o)));
-        numberMatchers.put(PredicateType.LESS_OR_EQUAL, ((customValue, objects) ->
-                objects.stream().map(Float::parseFloat).anyMatch(o -> customValue <= o)));
+        numberMatchers.put(PredicateType.EQUAL_TO, ((target, objects) ->
+                objects.stream().map(Double::parseDouble).anyMatch(o -> target == o)));
+        numberMatchers.put(PredicateType.NOT_EQUAL_TO, ((target, objects) ->
+                objects.stream().map(Double::parseDouble).noneMatch(o -> target == o)));
+        numberMatchers.put(PredicateType.GREATER_THAN, ((target, objects) ->
+                objects.stream().map(Double::parseDouble).anyMatch(o -> target > o)));
+        numberMatchers.put(PredicateType.GREATER_OR_EQUAL, ((target, objects) ->
+                objects.stream().map(Double::parseDouble).anyMatch(o -> target >= o)));
+        numberMatchers.put(PredicateType.LESS_THAN, ((target, objects) ->
+                objects.stream().map(Double::parseDouble).anyMatch(o -> target < o)));
+        numberMatchers.put(PredicateType.LESS_OR_EQUAL, ((target, objects) ->
+                objects.stream().map(Double::parseDouble).anyMatch(o -> target <= o)));
 
-        semverMatchers.put(PredicateType.EQUAL, ((customValue, objects) ->
-                objects.stream().filter(Objects::nonNull).map(ComparableVersion::new).anyMatch(t -> customValue.compareTo(t) == 0)));
-        semverMatchers.put(PredicateType.NOT_EQUAL, ((customValue, objects) ->
-                objects.stream().filter(Objects::nonNull).map(ComparableVersion::new).noneMatch(t -> customValue.compareTo(t) == 0)));
-        semverMatchers.put(PredicateType.GREATER_THAN, ((customValue, objects) ->
-                objects.stream().filter(Objects::nonNull).map(ComparableVersion::new).anyMatch(t -> customValue.compareTo(t) > 0)));
-        semverMatchers.put(PredicateType.GREATER_OR_EQUAL, ((customValue, objects) ->
-                objects.stream().filter(Objects::nonNull).map(ComparableVersion::new).anyMatch(t -> customValue.compareTo(t) >= 0)));
-        semverMatchers.put(PredicateType.LESS_THAN, ((customValue, objects) ->
-                objects.stream().filter(Objects::nonNull).map(ComparableVersion::new).anyMatch(t -> customValue.compareTo(t) < 0)));
-        semverMatchers.put(PredicateType.LESS_OR_EQUAL, ((customValue, objects) ->
-                objects.stream().filter(Objects::nonNull).map(ComparableVersion::new).anyMatch(t -> customValue.compareTo(t) <= 0)));
+        semverMatchers.put(PredicateType.EQUAL_TO, ((target, objects) ->
+                objects.stream().filter(Objects::nonNull).map(ComparableVersion::new).anyMatch(t -> target.compareTo(t) == 0)));
+        semverMatchers.put(PredicateType.NOT_EQUAL_TO, ((target, objects) ->
+                objects.stream().filter(Objects::nonNull).map(ComparableVersion::new).noneMatch(t -> target.compareTo(t) == 0)));
+        semverMatchers.put(PredicateType.GREATER_THAN, ((target, objects) ->
+                objects.stream().filter(Objects::nonNull).map(ComparableVersion::new).anyMatch(t -> target.compareTo(t) > 0)));
+        semverMatchers.put(PredicateType.GREATER_OR_EQUAL, ((target, objects) ->
+                objects.stream().filter(Objects::nonNull).map(ComparableVersion::new).anyMatch(t -> target.compareTo(t) >= 0)));
+        semverMatchers.put(PredicateType.LESS_THAN, ((target, objects) ->
+                objects.stream().filter(Objects::nonNull).map(ComparableVersion::new).anyMatch(t -> target.compareTo(t) < 0)));
+        semverMatchers.put(PredicateType.LESS_OR_EQUAL, ((target, objects) ->
+                objects.stream().filter(Objects::nonNull).map(ComparableVersion::new).anyMatch(t -> target.compareTo(t) <= 0)));
 
     }
 
     public boolean matchObjects(FPUser user, Map<String, Segment> segments) {
         switch (type) {
             case STRING:
-                String subjectValue = user.getAttr(subject);
-                if (StringUtils.isBlank(subjectValue)) {
-                    return false;
-                }
-                return matchStringCondition(subjectValue);
+                return matchStringCondition(user);
 
             case SEGMENT:
                 return matchSegmentCondition(user, segments);
@@ -114,7 +115,12 @@ public final class Condition {
         }
     }
 
-    private boolean matchStringCondition(String subjectValue) {
+    private boolean matchStringCondition(FPUser user) {
+        String subjectValue = user.getAttr(subject);
+        if (StringUtils.isBlank(subjectValue)) {
+            return false;
+        }
+
         StringMatcher stringMatcher = stringMatchers.get(this.predicate);
         if (Objects.isNull(stringMatcher)) {
             return false;
@@ -138,15 +144,20 @@ public final class Condition {
             return false;
         }
 
+        String customValue = user.getAttr(this.subject);
+        long cv;
         try {
-            String customValue = user.getAttr(this.subject);
-            long cv = StringUtils.isBlank(customValue)
+            cv = StringUtils.isBlank(customValue)
                     ? System.currentTimeMillis() / MILLISECONDS_IN_ONE_SEC
                     : Long.parseLong(customValue);
-            return this.objects.stream()
-                    .mapToLong(Long::parseLong)
-                    .anyMatch(t -> datetimeMatcher.match(t, cv));
         } catch (NumberFormatException e) {
+            logger.error("User attribute type mismatch. attribute value: {}, target type long", customValue);
+            return false;
+        }
+        try {
+            return datetimeMatcher.match(cv, objects);
+        } catch (NumberFormatException e) {
+            logger.error("Met a string that cannot be parsed to long in Condition.objects: {}", e.getMessage());
             return false;
         }
     }
@@ -157,14 +168,21 @@ public final class Condition {
             return false;
         }
 
+        String customValue = user.getAttr(this.subject);
+        if (StringUtils.isBlank(customValue)) {
+            return false;
+        }
+        double cv;
         try {
-            String customValue = user.getAttr(this.subject);
-            if (StringUtils.isBlank(customValue)) {
-                return false;
-            }
-            float cv = Float.parseFloat(customValue);
+            cv = Double.parseDouble(customValue);
+        } catch (NumberFormatException e) {
+            logger.error("User attribute type mismatch. attribute value : {}, target type double", customValue);
+            return false;
+        }
+        try {
             return numberMatcher.match(cv, this.objects);
         } catch (NumberFormatException e) {
+            logger.error("Met a string that cannot be parsed to double in Condition.objects: {}", e.getMessage());
             return false;
         }
     }

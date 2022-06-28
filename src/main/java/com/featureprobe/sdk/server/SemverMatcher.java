@@ -7,6 +7,6 @@ import java.util.List;
 @FunctionalInterface
 public interface SemverMatcher {
 
-    boolean match(ComparableVersion customValue, List<String> objects);
+    boolean match(ComparableVersion target, List<String> objects);
 
 }
