@@ -2,7 +2,6 @@ package com.featureprobe.sdk.server.model;
 
 import com.featureprobe.sdk.server.FPUser;
 import com.featureprobe.sdk.server.HitResult;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -16,7 +15,9 @@ public final class Rule {
 
     public HitResult hit(FPUser user, Map<String, Segment> segments, String toggleKey) {
         for (Condition condition : conditions) {
-            if (condition.getType() != ConditionType.SEGMENT && !user.containAttr(condition.getSubject())) {
+            if (condition.getType() != ConditionType.SEGMENT
+                    && condition.getType() != ConditionType.DATETIME
+                    && !user.containAttr(condition.getSubject())) {
                 return new HitResult(false,
                         Optional.of(String.format("Warning: User with key '%s' does not have attribute name '%s'",
                                 user.getKey(), condition.getSubject())));

@@ -1,17 +1,16 @@
 package com.featureprobe.sdk.server.model;
 
-import com.featureprobe.sdk.server.FPUser;
-import com.featureprobe.sdk.server.StringMatcher;
-import com.featureprobe.sdk.server.SegmentMatcher;
+import com.featureprobe.sdk.server.*;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.artifact.versioning.ComparableVersion;
+import org.slf4j.Logger;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public final class Condition {
+
+    private static final Logger logger = Loggers.EVALUATOR;
 
     private ConditionType type;
 
@@ -21,13 +20,20 @@ public final class Condition {
 
     private List<String> objects;
 
-    private static final Map<PredicateType, StringMatcher> stringMatchers =
-            new HashMap<>(PredicateType.values().length);
+    private static final long MILLISECONDS_IN_ONE_SEC = 1000;
 
-    private static final Map<PredicateType, SegmentMatcher> segmentMatchers =
-            new HashMap<>(PredicateType.values().length);
+    private static final Map<PredicateType, StringMatcher> stringMatchers = new EnumMap<>(PredicateType.class);
+
+    private static final Map<PredicateType, SegmentMatcher> segmentMatchers = new EnumMap<>(PredicateType.class);
+
+    private static final Map<PredicateType, DatetimeMatcher> datetimeMatchers = new EnumMap<>(PredicateType.class);
+
+    private static final Map<PredicateType, NumberMatcher> numberMatchers = new EnumMap<>(PredicateType.class);
+
+    private static final Map<PredicateType, SemverMatcher> semverMatchers = new EnumMap<>(PredicateType.class);
 
     static {
+
         stringMatchers.put(PredicateType.IS_ONE_OF, (target, objects) ->
                 objects.contains(target));
         stringMatchers.put(PredicateType.ENDS_WITH, (target, objects) ->
@@ -50,43 +56,149 @@ public final class Condition {
                 objects.stream().noneMatch(s -> Pattern.compile(s).matcher(target).find()));
 
         segmentMatchers.put(PredicateType.IS_IN, (user, segments, objects) ->
-            objects.stream().anyMatch(s -> segments.get(s).contains(user, segments)));
+                objects.stream().anyMatch(s -> segments.get(s).contains(user, segments)));
         segmentMatchers.put(PredicateType.IS_NOT_IN, (user, segments, objects) ->
                 objects.stream().noneMatch(s -> segments.get(s).contains(user, segments)));
+
+        datetimeMatchers.put(PredicateType.AFTER, ((target, objects) ->
+                objects.stream().map(Long::parseLong).anyMatch(o -> target >= o)));
+        datetimeMatchers.put(PredicateType.BEFORE, ((target, objects) ->
+                objects.stream().map(Long::parseLong).anyMatch(o -> target < o)));
+
+        numberMatchers.put(PredicateType.EQUAL_TO, ((target, objects) ->
+                objects.stream().map(Double::parseDouble).anyMatch(o -> target == o)));
+        numberMatchers.put(PredicateType.NOT_EQUAL_TO, ((target, objects) ->
+                objects.stream().map(Double::parseDouble).noneMatch(o -> target == o)));
+        numberMatchers.put(PredicateType.GREATER_THAN, ((target, objects) ->
+                objects.stream().map(Double::parseDouble).anyMatch(o -> target > o)));
+        numberMatchers.put(PredicateType.GREATER_OR_EQUAL, ((target, objects) ->
+                objects.stream().map(Double::parseDouble).anyMatch(o -> target >= o)));
+        numberMatchers.put(PredicateType.LESS_THAN, ((target, objects) ->
+                objects.stream().map(Double::parseDouble).anyMatch(o -> target < o)));
+        numberMatchers.put(PredicateType.LESS_OR_EQUAL, ((target, objects) ->
+                objects.stream().map(Double::parseDouble).anyMatch(o -> target <= o)));
+
+        semverMatchers.put(PredicateType.EQUAL_TO, ((target, objects) ->
+                objects.stream().filter(Objects::nonNull).map(ComparableVersion::new).anyMatch(t -> target.compareTo(t) == 0)));
+        semverMatchers.put(PredicateType.NOT_EQUAL_TO, ((target, objects) ->
+                objects.stream().filter(Objects::nonNull).map(ComparableVersion::new).noneMatch(t -> target.compareTo(t) == 0)));
+        semverMatchers.put(PredicateType.GREATER_THAN, ((target, objects) ->
+                objects.stream().filter(Objects::nonNull).map(ComparableVersion::new).anyMatch(t -> target.compareTo(t) > 0)));
+        semverMatchers.put(PredicateType.GREATER_OR_EQUAL, ((target, objects) ->
+                objects.stream().filter(Objects::nonNull).map(ComparableVersion::new).anyMatch(t -> target.compareTo(t) >= 0)));
+        semverMatchers.put(PredicateType.LESS_THAN, ((target, objects) ->
+                objects.stream().filter(Objects::nonNull).map(ComparableVersion::new).anyMatch(t -> target.compareTo(t) < 0)));
+        semverMatchers.put(PredicateType.LESS_OR_EQUAL, ((target, objects) ->
+                objects.stream().filter(Objects::nonNull).map(ComparableVersion::new).anyMatch(t -> target.compareTo(t) <= 0)));
 
     }
 
     public boolean matchObjects(FPUser user, Map<String, Segment> segments) {
         switch (type) {
             case STRING:
-                String subjectValue = user.getAttrs().get(subject);
-                if (StringUtils.isBlank(subjectValue)) {
-                    return false;
-                }
-                return matchStringCondition(subjectValue);
+                return matchStringCondition(user);
+
             case SEGMENT:
                 return matchSegmentCondition(user, segments);
-            case DATE:
-                // TODO
+
+            case DATETIME:
+                return matchDatetimeCondition(user);
+
+            case NUMBER:
+                return matchNumberCondition(user);
+
+            case SEMVER:
+                return matchSemverCondition(user);
+
             default:
                 return false;
         }
     }
 
-    private boolean matchStringCondition(String subjectValue) {
-        StringMatcher stringMatcher = stringMatchers.get(this.predicate);
-        if (Objects.nonNull(stringMatcher)) {
-            return stringMatcher.match(subjectValue, this.objects);
+    private boolean matchStringCondition(FPUser user) {
+        String subjectValue = user.getAttr(subject);
+        if (StringUtils.isBlank(subjectValue)) {
+            return false;
         }
-        return false;
+
+        StringMatcher stringMatcher = stringMatchers.get(this.predicate);
+        if (Objects.isNull(stringMatcher)) {
+            return false;
+        }
+
+        return stringMatcher.match(subjectValue, this.objects);
     }
 
     private boolean matchSegmentCondition(FPUser user, Map<String, Segment> segments) {
         SegmentMatcher segmentMatcher = segmentMatchers.get(this.predicate);
-        if (Objects.nonNull(segmentMatcher)) {
-            return segmentMatcher.match(user, segments, this.objects);
+        if (Objects.isNull(segmentMatcher)) {
+            return false;
         }
-        return false;
+
+        return segmentMatcher.match(user, segments, this.objects);
+    }
+
+    private boolean matchDatetimeCondition(FPUser user) {
+        DatetimeMatcher datetimeMatcher = datetimeMatchers.get(this.predicate);
+        if (Objects.isNull(datetimeMatcher)) {
+            return false;
+        }
+
+        String customValue = user.getAttr(this.subject);
+        long cv;
+        try {
+            cv = StringUtils.isBlank(customValue)
+                    ? System.currentTimeMillis() / MILLISECONDS_IN_ONE_SEC
+                    : Long.parseLong(customValue);
+        } catch (NumberFormatException e) {
+            logger.error("User attribute type mismatch. attribute value: {}, target type long", customValue);
+            return false;
+        }
+        try {
+            return datetimeMatcher.match(cv, objects);
+        } catch (NumberFormatException e) {
+            logger.error("Met a string that cannot be parsed to long in Condition.objects: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    private boolean matchNumberCondition(FPUser user) {
+        NumberMatcher numberMatcher = numberMatchers.get(this.predicate);
+        if (Objects.isNull(numberMatcher)) {
+            return false;
+        }
+
+        String customValue = user.getAttr(this.subject);
+        if (StringUtils.isBlank(customValue)) {
+            return false;
+        }
+        double cv;
+        try {
+            cv = Double.parseDouble(customValue);
+        } catch (NumberFormatException e) {
+            logger.error("User attribute type mismatch. attribute value : {}, target type double", customValue);
+            return false;
+        }
+        try {
+            return numberMatcher.match(cv, this.objects);
+        } catch (NumberFormatException e) {
+            logger.error("Met a string that cannot be parsed to double in Condition.objects: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    private boolean matchSemverCondition(FPUser user) {
+        SemverMatcher semverMatcher = semverMatchers.get(this.predicate);
+        if (Objects.isNull(semverMatcher)) {
+            return false;
+        }
+
+        String customValue = user.getAttr(this.subject);
+        if (StringUtils.isBlank(customValue)) {
+            return false;
+        }
+        ComparableVersion cv = new ComparableVersion(customValue);
+        return semverMatcher.match(cv, this.objects);
     }
 
     public ConditionType getType() {
