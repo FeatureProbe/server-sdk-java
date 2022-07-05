@@ -1,4 +1,6 @@
 # FeatureProbe Server Side SDK for Java
+
+[![Maven Central](https://img.shields.io/maven-central/v/com.featureprobe/server-sdk-java)](https://search.maven.org/artifact/com.featureprobe/server-sdk-java)
 [![codecov](https://codecov.io/gh/FeatureProbe/server-sdk-java/branch/main/graph/badge.svg?token=WZC3ZS6NNL)](https://codecov.io/gh/FeatureProbe/server-sdk-java)
 [![GitHub Star](https://img.shields.io/github/stars/FeatureProbe/server-sdk-java)](https://github.com/FeatureProbe/server-sdk-java/stargazers)
 [![License](https://img.shields.io/github/license/FeatureProbe/server-sdk-java)](https://github.com/FeatureProbe/server-sdk-java/blob/main/LICENSE)
@@ -18,18 +20,17 @@ First, install the FeatureProbe SDK as a dependency in your application.
 #### Apache Maven
 
 ```xml
-
 <dependency>
     <groupId>com.featureprobe</groupId>
     <artifactId>server-sdk-java</artifactId>
-    <version>1.1.1</version>
+    <version>1.2.0</version>
 </dependency>
 ```
 
 #### Gradle Groovy DSL
 
 ```text
-implementation 'com.featureprobe:server-sdk-java:1.1.1'
+implementation 'com.featureprobe:server-sdk-java:1.2.0'
 ```
 
 ### Step 2. Create a FeatureProbe instance
