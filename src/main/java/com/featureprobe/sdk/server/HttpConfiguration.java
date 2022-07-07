@@ -1,6 +1,7 @@
 package com.featureprobe.sdk.server;
 
 import okhttp3.ConnectionPool;
+import okhttp3.Headers;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
@@ -26,11 +27,14 @@ public final class HttpConfiguration {
 
     final Duration writeTimeout;
 
+    final Headers headers;
+
     protected HttpConfiguration(Builder builder) {
         this.connectionPool = Builder.connectionPool;
         this.connectTimeout = Builder.connectTimeout;
         this.readTimeout = Builder.readTimeout;
         this.writeTimeout = Builder.writeTimeout;
+        this.headers =  Builder.headers;
     }
 
     public static Builder builder() {
@@ -47,7 +51,14 @@ public final class HttpConfiguration {
 
         private static Duration writeTimeout = DEFAULT_WRITE_TIMEOUT;
 
+        private static Headers headers = new Headers.Builder().build();
+
         public Builder() {
+        }
+
+        public Builder headers(Headers headers) {
+            Builder.headers = headers == null ? new Headers.Builder().build() : headers;
+            return this;
         }
 
         public Builder connectionPool(ConnectionPool connectionPool) {

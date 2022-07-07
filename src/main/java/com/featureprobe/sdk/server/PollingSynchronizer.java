@@ -47,8 +47,7 @@ final class PollingSynchronizer implements Synchronizer {
                 .readTimeout(context.getHttpConfiguration().readTimeout)
                 .writeTimeout(context.getHttpConfiguration().writeTimeout)
                 .retryOnConnectionFailure(false);
-        Headers.Builder headerBuilder = new Headers.Builder();
-        headers = headerBuilder.add(GET_SDK_KEY_HEADER, context.getServerSdkKey()).build();
+        headers = context.getHeaders();
         httpClient = builder.build();
     }
 
