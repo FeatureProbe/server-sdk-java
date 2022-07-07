@@ -29,8 +29,6 @@ public class DefaultEventProcessor implements EventProcessor {
 
     private static final Logger logger = Loggers.EVENT;
 
-    private static final String GET_SDK_KEY_HEADER = "Authorization";
-
     private static final int EVENT_BATCH_HANDLE_SIZE = 50;
 
     private final AtomicBoolean closed = new AtomicBoolean(false);
@@ -159,7 +157,6 @@ public class DefaultEventProcessor implements EventProcessor {
 
         SendEventsTask(FPContext context, List<EventRepository> repositories) {
             this.apiUrl = context.getEventUrl();
-            Headers.Builder headerBuilder = new Headers.Builder();
             OkHttpClient.Builder builder = new OkHttpClient.Builder()
                     .connectionPool(context.getHttpConfiguration().connectionPool)
                     .connectTimeout(context.getHttpConfiguration().connectTimeout)
@@ -167,7 +164,7 @@ public class DefaultEventProcessor implements EventProcessor {
                     .writeTimeout(context.getHttpConfiguration().writeTimeout)
                     .retryOnConnectionFailure(false);
             httpClient = builder.build();
-            headers = headerBuilder.add(GET_SDK_KEY_HEADER, context.getServerSdkKey()).build();
+            headers = context.getHeaders();
             this.repositories = repositories;
         }
 

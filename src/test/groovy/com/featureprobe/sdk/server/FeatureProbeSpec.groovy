@@ -41,7 +41,7 @@ class FeatureProbeSpec extends Specification {
         try {
             featureProbe = new FeatureProbe("foo")
         } catch (Exception ignored) {
-            fail("ctor should not fail with not empty sdk key")
+            fail("should not fail with not empty sdk key")
         }
     }
 

@@ -1,7 +1,9 @@
 package com.featureprobe.sdk.server;
 
+import okhttp3.Headers;
 import org.slf4j.Logger;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
@@ -10,6 +12,14 @@ import java.util.Objects;
 final class FPContext {
 
     private static final Logger logger = Loggers.MAIN;
+
+    private static final String GET_SDK_KEY_HEADER = "Authorization";
+
+    private static final String USER_AGENT_HEADER = "user-agent";
+
+    private static final String DEFAULT_SDK_VERSION = "unknown";
+
+    private static final String SDK_FLAG_PREFIX = "Java/";
 
     private static final String GET_REPOSITORY_DATA_API = "/api/server-sdk/toggles";
 
@@ -26,6 +36,8 @@ final class FPContext {
     private final String location;
 
     private final HttpConfiguration httpConfiguration;
+
+    private final Headers headers;
 
     FPContext(String serverSdkKey, FPConfig config) {
         try {
@@ -46,6 +58,16 @@ final class FPContext {
         this.refreshInterval = config.refreshInterval;
         this.location = config.location;
         this.httpConfiguration = config.httpConfiguration;
+        String sdkVersion = DEFAULT_SDK_VERSION;
+        try {
+            sdkVersion = Utils.readSdkVersion();
+        } catch (IOException e) {
+            logger.error("read sdk version error", e);
+        }
+        this.headers = config.httpConfiguration.headers.newBuilder()
+                .add(GET_SDK_KEY_HEADER, serverSdkKey)
+                .add(USER_AGENT_HEADER, SDK_FLAG_PREFIX + sdkVersion)
+                .build();
     }
 
     public URL getSynchronizerUrl() {
@@ -70,5 +92,9 @@ final class FPContext {
 
     public HttpConfiguration getHttpConfiguration() {
         return httpConfiguration;
+    }
+
+    public Headers getHeaders() {
+        return headers;
     }
 }
