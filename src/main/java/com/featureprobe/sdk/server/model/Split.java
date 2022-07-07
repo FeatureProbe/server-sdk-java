@@ -6,7 +6,6 @@ import com.featureprobe.sdk.server.HitResult;
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -39,7 +38,7 @@ public class Split {
         String hashKey = user.getKey();
         if (StringUtils.isNotBlank(bucketBy)) {
             if (user.containAttr(bucketBy)) {
-                hashKey = user.getAttrs().get(bucketBy);
+                hashKey = user.getAttr(bucketBy);
             } else {
                 return new HitResult(false,
                         Optional.of(String.format("Warning: User with key '%s' does not have attribute name '%s'",

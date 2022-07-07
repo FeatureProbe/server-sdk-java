@@ -1,12 +1,13 @@
 package com.featureprobe.sdk.server;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class FPUser {
 
     private String key;
 
-    private HashMap<String, String> attrs = new HashMap<>();
+    private Map<String, String> attrs = new HashMap<>();
 
 
     public void with(String key, String value) {
@@ -26,11 +27,16 @@ public class FPUser {
         return key;
     }
 
-    public HashMap<String, String> getAttrs() {
+    public Map<String, String> getAttrs() {
         return attrs;
     }
 
-    public void setAttrs(HashMap<String, String> attrs) {
+    public void setAttrs(Map<String, String> attrs) {
         this.attrs = attrs;
     }
+
+    public String getAttr(String key) {
+        return attrs.get(key);
+    }
+
 }

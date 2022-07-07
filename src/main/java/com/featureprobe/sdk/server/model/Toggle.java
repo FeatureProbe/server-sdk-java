@@ -5,6 +5,7 @@ import com.featureprobe.sdk.server.FPUser;
 import com.featureprobe.sdk.server.HitResult;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public final class Toggle {
@@ -25,7 +26,7 @@ public final class Toggle {
 
     private Boolean forClient;
 
-    public EvaluationResult eval(FPUser user, Object defaultValue) {
+    public EvaluationResult eval(FPUser user, Map<String, Segment> segments, Object defaultValue) {
         String warning = "";
 
         if (!enabled) {
@@ -35,7 +36,7 @@ public final class Toggle {
         if (rules != null && rules.size() > 0) {
             for (int i = 0; i < rules.size(); i++) {
                 Rule rule = rules.get(i);
-                HitResult hitResult = rule.hit(user, this.key);
+                HitResult hitResult = rule.hit(user, segments, this.key);
                 if (hitResult.isHit()) {
                     return hitValue(hitResult, defaultValue, Optional.of(i));
                 }

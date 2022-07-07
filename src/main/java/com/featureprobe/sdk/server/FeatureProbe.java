@@ -2,11 +2,13 @@ package com.featureprobe.sdk.server;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.featureprobe.sdk.server.model.Segment;
 import com.featureprobe.sdk.server.model.Toggle;
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -89,8 +91,9 @@ public final class FeatureProbe {
     private <T> T jsonEvaluate(String toggleKey, FPUser user, T defaultValue, Class<T> clazz) {
         try {
             Toggle toggle = dataRepository.getToggle(toggleKey);
+            Map<String, Segment> segments = dataRepository.getAllSegment();
             if (Objects.nonNull(toggle)) {
-                EvaluationResult evalResult = toggle.eval(user, defaultValue);
+                EvaluationResult evalResult = toggle.eval(user, segments, defaultValue);
                 String value = mapper.writeValueAsString(evalResult.getValue());
                 AccessEvent accessEvent = new AccessEvent(System.currentTimeMillis(), user,
                         toggleKey, String.valueOf(evalResult.getValue()), evalResult.getVersion(),
@@ -109,8 +112,9 @@ public final class FeatureProbe {
     private <T> T genericEvaluate(String toggleKey, FPUser user, T defaultValue, Class<T> clazz) {
         try {
             Toggle toggle = dataRepository.getToggle(toggleKey);
+            Map<String, Segment> segments = dataRepository.getAllSegment();
             if (Objects.nonNull(toggle)) {
-                EvaluationResult evalResult = toggle.eval(user, defaultValue);
+                EvaluationResult evalResult = toggle.eval(user, segments, defaultValue);
                 AccessEvent accessEvent = new AccessEvent(System.currentTimeMillis(), user,
                         toggleKey, String.valueOf(evalResult.getValue()), evalResult.getVersion(),
                         evalResult.getVariationIndex().get());
@@ -161,8 +165,9 @@ public final class FeatureProbe {
         FPDetail<T> detail = new FPDetail<>();
         if (this.dataRepository.initialized()) {
             Toggle toggle = dataRepository.getToggle(toggleKey);
+            Map<String, Segment> segments = dataRepository.getAllSegment();
             if (Objects.nonNull(toggle)) {
-                EvaluationResult evalResult = toggle.eval(user, defaultValue);
+                EvaluationResult evalResult = toggle.eval(user, segments, defaultValue);
                 if (isJson) {
                     String res = mapper.writeValueAsString(evalResult.getValue());
                     detail.setValue(mapper.readValue(res, clazz));
