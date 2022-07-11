@@ -89,6 +89,60 @@ git pull --recurse-submodules
 mvn test
 ```
 
+## Mock
+
+###1、Add powermock SDk to your project:
+
+```xml
+<dependency>
+    <groupId>org.powermock</groupId>
+    <artifactId>powermock-api-mockito2</artifactId>
+    <version>2.0.9</version>
+    <scope>test</scope>
+</dependency>
+<dependency>
+    <groupId>org.powermock</groupId>
+    <artifactId>powermock-module-junit4</artifactId>
+    <version>2.0.9</version>
+    <scope>test</scope>
+</dependency>
+```
+
+###2、Mock Toggle 
+
+####*target method*
+```java
+@AllArgsConstructor
+@Service
+public class DemoService {
+
+    FeatureProbe fp;
+
+    public boolean isTester(String userId, String tel) {
+        FPUser fpUser = new FPUser(userId);
+        fpUser.with("tel", tel);
+        return fp.boolValue("is_tester", fpUser, false);
+    }
+}
+```
+####*unit test*
+```java
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({FeatureProbe.class})
+public class FeatureProbeTest {
+
+    @Test
+    public void test() {
+        FeatureProbe fp = PowerMockito.mock(FeatureProbe.class);
+        DemoService demoService = new DemoService(fp);
+        Mockito.when(fp.boolValue(anyString(), any(FPUser.class), anyBoolean())).thenReturn(true);
+        boolean tester = demoService.isTester("user123", "12397347232");
+        assert tester;
+    }
+
+}
+```
+
 ## Contributing
 We are working on continue evolving FeatureProbe core, making it flexible and easier to use. 
 Development of FeatureProbe happens in the open on GitHub, and we are grateful to the 
