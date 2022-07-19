@@ -6,8 +6,6 @@ import com.featureprobe.sdk.server.FPUser;
 import com.featureprobe.sdk.server.FeatureProbe;
 
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
 
 public class FeatureProbeDemo {
 
@@ -22,8 +20,7 @@ public class FeatureProbeDemo {
 
     public static void main(String[] args) {
 
-        FPUser user = new FPUser("user_id");
-        user.with("city", "New York");
+        FPUser user = new FPUser("user_id").with("city", "New York");
 
         double discount = fpClient.numberValue("promotion_activity", user, 0);
         System.out.println("user in New York discount is :" + discount);
