@@ -9,9 +9,28 @@
 Feature Probe is an open source feature management service. This SDK is used to control features in java programs. This
 SDK is designed primarily for use in multi-user systems such as web servers and applications.
 
-## Getting started
+## Try Out Demo Code
 
-In this guide we explain how to use feature toggles in a Java application using FeatureProbe.
+We provide a runnable demo code for you to understand how FeatureProbe SDK is used.
+
+1. Start FeatureProbe Service with docker composer. [How to](https://github.com/FeatureProbe/FeatureProbe#1-starting-featureprobe-service-with-docker-compose)
+2. Download this repo and run the demo program:
+```bash
+git clone https://github.com/FeatureProbe/server-sdk-java.git
+cd server-sdk-java
+mvn package
+java -jar ./target/server-sdk-java-1.2.1.jar
+```
+3. Find the Demo code in [src/main/java/com/featureprobe/sdk/example/FeatureProbeDemo.java](https://github.com/FeatureProbe/server-sdk-java/blob/main/src/main/java/com/featureprobe/sdk/example/FeatureProbeDemo.java), 
+do some change and run the program again.
+```bash
+mvn package
+java -jar ./target/server-sdk-java-1.2.1.jar
+```
+
+## Step-by-Step Guide
+
+In this guide we explain how to use feature toggles in your own Java application using FeatureProbe.
 
 ### Step 1. Install the Java SDK
 
@@ -91,7 +110,7 @@ mvn test
 
 ## Mock
 
-### 1、Add powermock SDk to your project:
+### 1、Add powermock SDK to your project:
 
 ```xml
 <dependency>

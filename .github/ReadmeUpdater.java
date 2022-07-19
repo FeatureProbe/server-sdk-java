@@ -17,6 +17,9 @@ public class ReadmeUpdater {
                         String.format("<version>%s</version>", releaseVersion))
                 .replaceAll("implementation 'com\\.featureprobe:server-sdk-java:.*'",
                         String.format("implementation 'com.featureprobe:server-sdk-java:%s'", releaseVersion));
+                .replaceAll("./target/server-sdk-java-.*'",
+                        String.format("./target/server-sdk-java-%s.jar'", releaseVersion));
+
 
         String newPom = new String(Files.readAllBytes(POM_PATH))
                 .replaceAll("<artifactId>server-sdk-java</artifactId>\n    <version>.*</version>",
