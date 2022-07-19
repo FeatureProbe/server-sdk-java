@@ -4,36 +4,56 @@ import com.featureprobe.sdk.server.FPConfig;
 import com.featureprobe.sdk.server.FPDetail;
 import com.featureprobe.sdk.server.FPUser;
 import com.featureprobe.sdk.server.FeatureProbe;
-
 import java.time.Duration;
+import org.slf4j.LoggerFactory;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 
 public class FeatureProbeDemo {
 
-    private static final FPConfig config = FPConfig.builder()
-            .remoteUri("http://localhost:4007")
+    // FeatureProbe server URL
+    private static final String FEATURE_PROBE_SERVER_URL = "http://localhost:4007";
+
+    // Server Side SDK Key for your project and environment
+    public static final String SERVER_SDK_KEY = "server-8ed48815ef044428826787e9a238b9c6a479f98c";
+
+    // Toggle you want to use
+    public static final String TOGGLE_KEY = "promotion_activity";
+
+    public static void main(String[] args) {
+        Logger root = (Logger)LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
+        root.setLevel(Level.WARN);
+
+        final FPConfig config = FPConfig.builder()
+            .remoteUri(FEATURE_PROBE_SERVER_URL)
             .pollingMode(Duration.ofSeconds(3))
             .useMemoryRepository()
             .build();
 
-    private static final FeatureProbe fpClient =
-            new FeatureProbe("server-8ed48815ef044428826787e9a238b9c6a479f98c", config);
+        // Init FeatureProbe, share this FeatureProbe instance in your project.
+        final FeatureProbe fpClient = new FeatureProbe(SERVER_SDK_KEY, config);
 
-    public static void main(String[] args) {
-
+        // Create one user.
         FPUser user = new FPUser("user_id").with("city", "New York");
 
-        double discount = fpClient.numberValue("promotion_activity", user, 0);
+        // Get toggle result for this user.
+        double discount = fpClient.numberValue(TOGGLE_KEY, user, 0);
         System.out.println("user in New York discount is :" + discount);
-        FPDetail<Double> detail = fpClient.numberDetail("promotion_activity", user, 0);
+
+        // Demo of Detail function.
+        FPDetail<Double> detail = fpClient.numberDetail(TOGGLE_KEY, user, 0);
         System.out.println("detail:" + detail.getReason());
         System.out.println("rule index:" + detail.getRuleIndex());
 
+        // Create another user.
+        FPUser user2 = new FPUser("user_id2").with("city", "Paris");
 
-        FPUser user2 = new FPUser("user_id2");
-        user2.with("city", "Paris");
-        discount = fpClient.numberValue("promotion_activity", user2, 0);
+        // Get toggle result for the second user.
+        discount = fpClient.numberValue(TOGGLE_KEY, user2, 0);
         System.out.println("user in Paris discount is :" + discount);
-        FPDetail<Double> detail2 = fpClient.numberDetail("promotion_activity", user2, 0);
+
+        // Demo of Detail function.
+        FPDetail<Double> detail2 = fpClient.numberDetail(TOGGLE_KEY, user2, 0);
         System.out.println("detail2:" + detail2.getReason());
         System.out.println("rule index:" + detail2.getRuleIndex());
     }
