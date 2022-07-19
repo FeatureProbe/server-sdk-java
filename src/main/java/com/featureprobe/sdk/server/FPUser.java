@@ -10,8 +10,9 @@ public class FPUser {
     private Map<String, String> attrs = new HashMap<>();
 
 
-    public void with(String key, String value) {
+    public FPUser with(String key, String value) {
         attrs.put(key, value);
+        return this;
     }
 
     public boolean containAttr(String attr) {
