@@ -9,6 +9,10 @@
 Feature Probe is an open source feature management service. This SDK is used to control features in java programs. This
 SDK is designed primarily for use in multi-user systems such as web servers and applications.
 
+## Fundamental Concept
+
+Reading the short [fundamental concept](https://github.com/FeatureProbe/FeatureProbe/blob/main/BASIC_CONCEPTS.md) will help to understand the code blow more easily.  [中文](https://github.com/FeatureProbe/FeatureProbe/blob/main/BASIC_CONCEPTS_CN.md)
+
 ## Try Out Demo Code
 
 We provide a runnable demo code for you to understand how FeatureProbe SDK is used.
