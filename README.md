@@ -25,7 +25,7 @@ cd server-sdk-java
 mvn package
 java -jar ./target/server-sdk-java-1.2.1.jar
 ```
-3. Find the Demo code in [src/main/java/com/featureprobe/sdk/example/FeatureProbeDemo.java](https://github.com/FeatureProbe/server-sdk-java/blob/main/src/main/java/com/featureprobe/sdk/example/FeatureProbeDemo.java), 
+3. Find the Demo code in [example](https://github.com/FeatureProbe/server-sdk-java/blob/main/src/main/java/com/featureprobe/sdk/example/FeatureProbeDemo.java), 
 do some change and run the program again.
 ```bash
 mvn package
