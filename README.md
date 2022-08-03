@@ -89,9 +89,8 @@ public class Demo {
             config);
 
     public void test() {
-        FPUser user = new FPUser("user_unique_id");
-        user.with("userId", "9876");
-        user.with("tel", "12345678998");
+        String uniqueUserId = /* uniqueUserId */;
+        FPUser user = new FPUser(uniqueUserId).with("city", /* city */).with("gender", /* gender */).with("userId", /* userId */);
         boolean boolValue = fpClient.boolValue("bool_toggle_key", user, false);
         if (boolValue) {
             // application code to show the feature
