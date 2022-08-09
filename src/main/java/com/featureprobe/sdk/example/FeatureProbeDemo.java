@@ -18,8 +18,8 @@ public class FeatureProbeDemo {
     // private static final String FEATURE_PROBE_SERVER_URL = "http://localhost:4007";
 
     // FeatureProbe server URL for featureprobe.io
-    private static final String FEATURE_PROBE_IO_EVENT_URL = "https://featureprobe.io/api/server/events";
-    private static final String FEATURE_PROBE_IO_synchronizer_URL = "https://featureprobe.io/api/server/toggles";
+    private static final String FEATURE_PROBE_IO_EVENT_URL = "https://featureprobe.io/server/api/events";
+    private static final String FEATURE_PROBE_IO_synchronizer_URL = "https://featureprobe.io/server/api/server-sdk/toggles";
 
     // Server Side SDK Key for your project and environment
     public static final String SERVER_SDK_KEY = "server-8ed48815ef044428826787e9a238b9c6a479f98c";
