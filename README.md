@@ -63,7 +63,11 @@ After you install and import the SDK, create a single, shared instance of the Fe
 ```java
 public class Demo {
     private static final FPConfig config = FPConfig.builder()
-            .remoteUri("http://127.0.0.1:4007")
+            // FeatureProbe server URL for local docker
+            // .remoteUri("http://127.0.0.1:4007")
+            // FeatureProbe server URL for featureprobe.io
+            .eventUrl(new URL("https://featureprobe.io/api/server/events"))
+            .synchronizerUrl(new URL("https://featureprobe.io/api/server/toggles"))
             .pollingMode(Duration.ofSeconds(3))
             .useMemoryRepository()
             .build();
@@ -80,7 +84,11 @@ You can use sdk to check which variation a particular user will receive for a gi
 ```java
 public class Demo {
     private static final FPConfig config = FPConfig.builder()
-            .remoteUri("http://127.0.0.1:4007")
+            // FeatureProbe server URL for local docker
+            // .remoteUri("http://127.0.0.1:4007")
+            // FeatureProbe server URL for featureprobe.io
+            .eventUrl(new URL("https://featureprobe.io/api/server/events"))
+            .synchronizerUrl(new URL("https://featureprobe.io/api/server/toggles"))
             .pollingMode(Duration.ofSeconds(3))
             .useMemoryRepository()
             .build();

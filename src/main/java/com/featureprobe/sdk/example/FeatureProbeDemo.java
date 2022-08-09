@@ -4,6 +4,9 @@ import com.featureprobe.sdk.server.FPConfig;
 import com.featureprobe.sdk.server.FPDetail;
 import com.featureprobe.sdk.server.FPUser;
 import com.featureprobe.sdk.server.FeatureProbe;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.Duration;
 import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Level;
@@ -11,8 +14,12 @@ import ch.qos.logback.classic.Logger;
 
 public class FeatureProbeDemo {
 
-    // FeatureProbe server URL
-    private static final String FEATURE_PROBE_SERVER_URL = "http://localhost:4007";
+    // FeatureProbe server URL for local docker
+    // private static final String FEATURE_PROBE_SERVER_URL = "http://localhost:4007";
+
+    // FeatureProbe server URL for featureprobe.io
+    private static final String FEATURE_PROBE_IO_EVENT_URL = "https://featureprobe.io/api/server/events";
+    private static final String FEATURE_PROBE_IO_synchronizer_URL = "https://featureprobe.io/api/server/toggles";
 
     // Server Side SDK Key for your project and environment
     public static final String SERVER_SDK_KEY = "server-8ed48815ef044428826787e9a238b9c6a479f98c";
@@ -20,12 +27,14 @@ public class FeatureProbeDemo {
     // Toggle you want to use
     public static final String TOGGLE_KEY = "promotion_activity";
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws MalformedURLException {
         Logger root = (Logger)LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
         root.setLevel(Level.WARN);
 
         final FPConfig config = FPConfig.builder()
-            .remoteUri(FEATURE_PROBE_SERVER_URL)
+//            .remoteUri(FEATURE_PROBE_SERVER_URL)
+            .eventUrl(new URL(FEATURE_PROBE_IO_EVENT_URL))
+            .synchronizerUrl(new URL(FEATURE_PROBE_IO_synchronizer_URL))
             .pollingMode(Duration.ofSeconds(3))
             .useMemoryRepository()
             .build();
