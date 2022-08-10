@@ -17,7 +17,8 @@ Reading the short [Basic Terms](https://github.com/FeatureProbe/FeatureProbe/blo
 
 We provide a runnable demo code for you to understand how FeatureProbe SDK is used.
 
-1. Start FeatureProbe Service with docker composer. [How to](https://github.com/FeatureProbe/FeatureProbe#1-starting-featureprobe-service-with-docker-compose)
+1. a、Start FeatureProbe Service with docker composer. [How to](https://github.com/FeatureProbe/FeatureProbe#1-starting-featureprobe-service-with-docker-compose)
+   b、Start FeatureProbe Service with featureprobe.io. [Quick try](https://featureprobe.io/login)
 2. Download this repo and run the demo program:
 ```bash
 git clone https://github.com/FeatureProbe/server-sdk-java.git
