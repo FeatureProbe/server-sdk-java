@@ -15,11 +15,12 @@ Reading the short [Basic Terms](https://github.com/FeatureProbe/FeatureProbe/blo
 
 ## Try Out Demo Code
 
-We provide a runnable demo code for you to understand how FeatureProbe SDK is used.
+We provide a runnable [demo](https://github.com/FeatureProbe/server-sdk-java/blob/main/src/main/java/com/featureprobe/sdk/example/) for you to understand how FeatureProbe SDK is used.
 
-1. a、Start FeatureProbe Service with docker composer. [How to](https://github.com/FeatureProbe/FeatureProbe#1-starting-featureprobe-service-with-docker-compose)
-
-   b、Start FeatureProbe Service with featureprobe.io. [Quick try](https://featureprobe.io/login)
+1. Use featureprobe.io online service. [Go to](https://featureprobe.io/login).
+   
+   Or setup FeatureProbe service with docker composer. [How to](https://github.com/FeatureProbe/FeatureProbe#1-starting-featureprobe-service-with-docker-compose)
+    
 2. Download this repo and run the demo program:
 ```bash
 git clone https://github.com/FeatureProbe/server-sdk-java.git
@@ -27,7 +28,8 @@ cd server-sdk-java
 mvn package
 java -jar ./target/server-sdk-java-1.2.1.jar
 ```
-3. Find the Demo code in [example](https://github.com/FeatureProbe/server-sdk-java/blob/main/src/main/java/com/featureprobe/sdk/example/FeatureProbeDemo.java), 
+
+3. Find the Demo code [here](https://github.com/FeatureProbe/server-sdk-java/blob/main/src/main/java/com/featureprobe/sdk/example/FeatureProbeDemo.java), 
 do some change and run the program again.
 ```bash
 mvn package
