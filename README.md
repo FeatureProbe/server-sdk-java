@@ -74,8 +74,7 @@ public class Demo {
             // FeatureProbe server URL for local docker
             // .remoteUri("http://127.0.0.1:4007")
             // FeatureProbe server URL for featureprobe.io
-            .eventUrl(new URL("https://featureprobe.io/server/api/events"))
-            .synchronizerUrl(new URL("https://featureprobe.io/server/api/server-sdk/toggles"))
+            .remoteUri("https://featureprobe.io/server")
             .pollingMode(Duration.ofSeconds(3))
             .useMemoryRepository()
             .build();
@@ -95,8 +94,7 @@ public class Demo {
             // FeatureProbe server URL for local docker
             // .remoteUri("http://127.0.0.1:4007")
             // FeatureProbe server URL for featureprobe.io
-            .eventUrl(new URL("https://featureprobe.io/server/api/events"))
-            .synchronizerUrl(new URL("https://featureprobe.io/server/api/server-sdk/toggles"))
+            .remoteUri("https://featureprobe.io/server")
             .pollingMode(Duration.ofSeconds(3))
             .useMemoryRepository()
             .build();
