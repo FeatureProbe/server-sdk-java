@@ -19,22 +19,28 @@ Reading the short [Doc](https://github.com/FeatureProbe/feature-probe-docs/blob/
 
 ## Try Out Demo Code
 
-We provide a runnable [demo](https://github.com/FeatureProbe/server-sdk-java/blob/main/src/main/java/com/featureprobe/sdk/example/) for you to understand how FeatureProbe SDK is used.
+We provide a runnable [demo code](https://github.com/FeatureProbe/server-sdk-java/blob/main/src/main/java/com/featureprobe/sdk/example/) for you to understand how FeatureProbe SDK is used.
 
-1. Use featureprobe.io online service. [Go to](https://featureprobe.io/login).
-   
-   Or setup FeatureProbe service with docker composer. [How to](https://github.com/FeatureProbe/FeatureProbe#1-starting-featureprobe-service-with-docker-compose)
-    
+1. Select a FeatureProbe platform to connect to.
+   * You can use our online demo environment [FeatureProbe Demo](https://featureprobe.io/login).
+   * Or you can use docker composer to [set up your own FeatureProbe service](https://github.com/FeatureProbe/FeatureProbe#1-starting-featureprobe-service-with-docker-compose)
+
 2. Download this repo and run the demo program:
 ```bash
 git clone https://github.com/FeatureProbe/server-sdk-java.git
 cd server-sdk-java
-mvn package
-java -jar ./target/server-sdk-java-1.2.1.jar
 ```
+3. Find the Demo code in `src/main/java/com/featureprobe/sdk/example/FeatureProbeDemo.java` change `server url` and 
+   `server sdk key` to match the platform you selected.
+   * For online demo environment:
+      * `server url` = "https://featureprobe.io/server"
+      * `server sdk key` please copy from GUI: 
+     ![server_sdk_key snapshot](https://gitee.com/featureprobe/FeatureProbe/raw/main/pictures/server_sdk_key.png)
+   * For docker environment:
+     * `server url` = "http://YOUR_DOCKER_IP:4007"
+     * `server sdk key` = "server-8ed48815ef044428826787e9a238b9c6a479f98c"
 
-3. Find the Demo code [here](https://github.com/FeatureProbe/server-sdk-java/blob/main/src/main/java/com/featureprobe/sdk/example/FeatureProbeDemo.java), 
-do some change and run the program again.
+4. Run the program.
 ```bash
 mvn package
 java -jar ./target/server-sdk-java-1.2.1.jar
@@ -71,10 +77,7 @@ After you install and import the SDK, create a single, shared instance of the Fe
 ```java
 public class Demo {
     private static final FPConfig config = FPConfig.builder()
-            // FeatureProbe server URL for local docker
-            // .remoteUri("http://127.0.0.1:4007")
-            // FeatureProbe server URL for featureprobe.io
-            .remoteUri("https://featureprobe.io/server")
+            .remoteUri(new URL(/* FeatureProbe service URI */))
             .pollingMode(Duration.ofSeconds(3))
             .useMemoryRepository()
             .build();
@@ -90,28 +93,24 @@ You can use sdk to check which variation a particular user will receive for a gi
 
 ```java
 public class Demo {
-    private static final FPConfig config = FPConfig.builder()
-            // FeatureProbe server URL for local docker
-            // .remoteUri("http://127.0.0.1:4007")
-            // FeatureProbe server URL for featureprobe.io
-            .remoteUri("https://featureprobe.io/server")
-            .pollingMode(Duration.ofSeconds(3))
-            .useMemoryRepository()
-            .build();
+   private static final FPConfig config = FPConfig.builder()
+           .remoteUri(new URL(/* FeatureProbe service URI */))
+           .pollingMode(Duration.ofSeconds(3))
+           .useMemoryRepository()
+           .build();
 
-    private static final FeatureProbe fpClient = new FeatureProbe("server-8ed48815ef044428826787e9a238b9c6a479f98c",
-            config);
+   private static final FeatureProbe fpClient = new FeatureProbe("server-8ed48815ef044428826787e9a238b9c6a479f98c",
+           config);
 
-    public void test() {
-        String uniqueUserId = /* uniqueUserId */;
-        FPUser user = new FPUser(uniqueUserId).with("city", /* city */).with("gender", /* gender */).with("userId", /* userId */);
-        boolean boolValue = fpClient.boolValue("bool_toggle_key", user, false);
-        if (boolValue) {
-            // application code to show the feature
-        } else {
-            // the code to run if the feature is off
-        }
-    }
+   public void test() {
+      FPUser user = new FPUser(/* uniqueUserId */).with("city", /* city */).with("userId", /* userId */);
+      boolean boolValue = fpClient.boolValue("bool_toggle_key", user, false);
+      if (boolValue) {
+         // application code to show the feature
+      } else {
+         // the code to run if the feature is off
+      }
+   }
 }
 ```
 
