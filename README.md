@@ -77,7 +77,7 @@ After you install and import the SDK, create a single, shared instance of the Fe
 ```java
 public class Demo {
     private static final FPConfig config = FPConfig.builder()
-            .remoteUri(new URL(/* FeatureProbe service URI */))
+            .remoteUri(/* FeatureProbe service URI */)
             .pollingMode(Duration.ofSeconds(3))
             .useMemoryRepository()
             .build();
@@ -94,7 +94,7 @@ You can use sdk to check which variation a particular user will receive for a gi
 ```java
 public class Demo {
    private static final FPConfig config = FPConfig.builder()
-           .remoteUri(new URL(/* FeatureProbe service URI */))
+           .remoteUri(/* FeatureProbe service URI */)
            .pollingMode(Duration.ofSeconds(3))
            .useMemoryRepository()
            .build();
