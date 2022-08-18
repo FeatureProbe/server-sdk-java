@@ -60,14 +60,14 @@ First, install the FeatureProbe SDK as a dependency in your application.
 <dependency>
     <groupId>com.featureprobe</groupId>
     <artifactId>server-sdk-java</artifactId>
-    <version>1.2.0</version>
+    <version>1.2.1</version>
 </dependency>
 ```
 
 #### Gradle Groovy DSL
 
 ```text
-implementation 'com.featureprobe:server-sdk-java:1.2.0'
+implementation 'com.featureprobe:server-sdk-java:1.2.1'
 ```
 
 ### Step 2. Create a FeatureProbe instance
