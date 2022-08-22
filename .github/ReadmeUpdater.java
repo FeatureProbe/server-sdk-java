@@ -16,7 +16,7 @@ public class ReadmeUpdater {
                 .replaceAll("<version>.*</version>",
                         String.format("<version>%s</version>", releaseVersion))
                 .replaceAll("implementation 'com\\.featureprobe:server-sdk-java:.*'",
-                        String.format("implementation 'com.featureprobe:server-sdk-java:%s'", releaseVersion));
+                        String.format("implementation 'com.featureprobe:server-sdk-java:%s'", releaseVersion))
                 .replaceAll("./target/server-sdk-java-.*'",
                         String.format("./target/server-sdk-java-%s.jar'", releaseVersion));
 
