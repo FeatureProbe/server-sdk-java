@@ -51,7 +51,7 @@ public final class FeatureProbe {
 
     /**
      * Creates a new client to connect to FeatureProbe with a custom configuration.
-     * @param sdkKey for your LaunchDarkly environment
+     * @param sdkKey for your FeatureProbe environment
      * @param config the configuration control FeatureProbe client behavior
      */
     public FeatureProbe(String sdkKey, FPConfig config) {
