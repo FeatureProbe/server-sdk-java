@@ -7,11 +7,14 @@ import com.featureprobe.sdk.server.model.Toggle;
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
-
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * A client for the FeatureProbe API. Client instances are thread-safe.
+ * Applications should instantiate a single {@code FeatureProbe} for the lifetime of their application.
+ */
 public final class FeatureProbe {
 
     private static final Logger logger = Loggers.MAIN;
@@ -38,10 +41,19 @@ public final class FeatureProbe {
         eventProcessor = config.eventProcessorFactory.createEventProcessor(context);
     }
 
+    /**
+     * Creates a new client instance that connects to FeatureProbe with the default configuration.
+     * @param sdkKey for your FeatureProbe environment
+     */
     public FeatureProbe(String sdkKey) {
         this(sdkKey, FPConfig.DEFAULT);
     }
 
+    /**
+     * Creates a new client to connect to FeatureProbe with a custom configuration.
+     * @param sdkKey for your LaunchDarkly environment
+     * @param config the configuration control FeatureProbe client behavior
+     */
     public FeatureProbe(String sdkKey, FPConfig config) {
         if (StringUtils.isBlank(sdkKey)) {
             throw new IllegalArgumentException("sdkKey must not be blank");
@@ -52,38 +64,101 @@ public final class FeatureProbe {
         config.synchronizerFactory.createSynchronizer(context, dataRepository).sync();
     }
 
+    /**
+     * Get the evaluated value of a boolean toggle
+     * @param toggleKey
+     * @param user {@link FPUser}
+     * @param defaultValue
+     * @return
+     */
     public boolean boolValue(String toggleKey, FPUser user, boolean defaultValue) {
         return genericEvaluate(toggleKey, user, defaultValue, Boolean.class);
     }
 
+    /**
+     * Get the evaluated value of a string toggle
+     * @param toggleKey
+     * @param user {@link FPUser}
+     * @param defaultValue
+     * @return
+     */
     public String stringValue(String toggleKey, FPUser user, String defaultValue) {
         return genericEvaluate(toggleKey, user, defaultValue, String.class);
     }
 
+    /**
+     * Get the evaluated value of a number toggle
+     * @param toggleKey
+     * @param user {@link FPUser}
+     * @param defaultValue
+     * @return
+     */
     public double numberValue(String toggleKey, FPUser user, double defaultValue) {
         return genericEvaluate(toggleKey, user, defaultValue, Double.class);
     }
 
+    /**
+     * Get the evaluated value of a json toggle
+     * @param toggleKey
+     * @param user {@link FPUser}
+     * @param defaultValue
+     * @param clazz
+     * @param <T>
+     * @return
+     */
     public <T> T jsonValue(String toggleKey, FPUser user, T defaultValue, Class<T> clazz) {
         return jsonEvaluate(toggleKey, user, defaultValue, clazz);
     }
 
+    /**
+     * Get detailed evaluation results of boolean toggle
+     * @param toggleKey
+     * @param user {@link FPUser}
+     * @param defaultValue
+     * @return
+     */
     public FPDetail<Boolean> boolDetail(String toggleKey, FPUser user, boolean defaultValue) {
         return genericEvaluateDetail(toggleKey, user, defaultValue, Boolean.class);
     }
 
+    /**
+     * Get detailed evaluation results of string toggle
+     * @param toggleKey
+     * @param user {@link FPUser}
+     * @param defaultValue
+     * @return
+     */
     public FPDetail<String> stringDetail(String toggleKey, FPUser user, String defaultValue) {
         return genericEvaluateDetail(toggleKey, user, defaultValue, String.class);
     }
 
+    /**
+     * Get detailed evaluation results of number toggle
+     * @param toggleKey
+     * @param user {@link FPUser}
+     * @param defaultValue
+     * @return
+     */
     public FPDetail<Double> numberDetail(String toggleKey, FPUser user, double defaultValue) {
         return genericEvaluateDetail(toggleKey, user, defaultValue, Double.class);
     }
 
+    /**
+     * Get detailed evaluation results of json toggle
+     * @param toggleKey
+     * @param user {@link FPUser}
+     * @param defaultValue
+     * @param clazz
+     * @param <T>
+     * @return
+     */
     public <T> FPDetail<T> jsonDetail(String toggleKey, FPUser user, T defaultValue, Class<T> clazz) {
         return jsonEvaluateDetail(toggleKey, user, defaultValue, clazz);
     }
 
+    /**
+     * Manually events push
+     */
     public void flush() {
         eventProcessor.flush();
     }
