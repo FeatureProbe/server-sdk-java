@@ -175,6 +175,7 @@ public final class FeatureProbe {
         eventProcessor.shutdown();
         synchronizer.close();
         dataRepository.close();
+        logger.info("FeatureProbe client has been closed safely。");
     }
 
     private <T> T jsonEvaluate(String toggleKey, FPUser user, T defaultValue, Class<T> clazz) {
