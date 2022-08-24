@@ -15,6 +15,7 @@ public class FeatureProbeDemo {
     // FeatureProbe server URL for local docker
     private static final String FEATURE_PROBE_SERVER_URL = "http://localhost:4009/server"; // "https://featureprobe.io/server";
 
+
     // Server Side SDK Key for your project and environment
     public static final String FEATURE_PROBE_SERVER_SDK_KEY = "server-8ed48815ef044428826787e9a238b9c6a479f98c";
 
@@ -46,6 +47,7 @@ public class FeatureProbeDemo {
         System.out.println("rule index:" + isOpenDetail.getRuleIndex());
 
         fpClient.close();
+
     }
 
 }
