@@ -7,11 +7,15 @@ import com.featureprobe.sdk.server.model.Toggle;
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
-
+import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * A client for the FeatureProbe API. Client instances are thread-safe.
+ * Applications should instantiate a single {@code FeatureProbe} for the lifetime of their application.
+ */
 public final class FeatureProbe {
 
     private static final Logger logger = Loggers.MAIN;
@@ -27,6 +31,8 @@ public final class FeatureProbe {
     @VisibleForTesting
     final DataRepository dataRepository;
 
+    Synchronizer synchronizer;
+
     @VisibleForTesting
     EventProcessor eventProcessor;
 
@@ -38,54 +44,133 @@ public final class FeatureProbe {
         eventProcessor = config.eventProcessorFactory.createEventProcessor(context);
     }
 
-    public FeatureProbe(String sdkKey) {
-        this(sdkKey, FPConfig.DEFAULT);
+    /**
+     * Creates a new client instance that connects to FeatureProbe with the default configuration.
+     * @param serverSDKKey for your FeatureProbe environment
+     */
+    public FeatureProbe(String serverSDKKey) {
+        this(serverSDKKey, FPConfig.DEFAULT);
     }
 
-    public FeatureProbe(String sdkKey, FPConfig config) {
-        if (StringUtils.isBlank(sdkKey)) {
-            throw new IllegalArgumentException("sdkKey must not be blank");
+    /**
+     * Creates a new client to connect to FeatureProbe with a custom configuration.
+     * @param serverSDKKey for your FeatureProbe environment
+     * @param config the configuration control FeatureProbe client behavior
+     */
+    public FeatureProbe(String serverSDKKey, FPConfig config) {
+        if (StringUtils.isBlank(serverSDKKey)) {
+            throw new IllegalArgumentException("serverSDKKey must not be blank");
         }
-        final FPContext context = new FPContext(sdkKey, config);
-        eventProcessor = config.eventProcessorFactory.createEventProcessor(context);
+        final FPContext context = new FPContext(serverSDKKey, config);
+        this.eventProcessor = config.eventProcessorFactory.createEventProcessor(context);
         this.dataRepository = config.dataRepositoryFactory.createDataRepository(context);
-        config.synchronizerFactory.createSynchronizer(context, dataRepository).sync();
+        this.synchronizer = config.synchronizerFactory.createSynchronizer(context, dataRepository);
+        this.synchronizer.sync();
     }
 
+    /**
+     * Get the evaluated value of a boolean toggle
+     * @param toggleKey
+     * @param user {@link FPUser}
+     * @param defaultValue
+     * @return
+     */
     public boolean boolValue(String toggleKey, FPUser user, boolean defaultValue) {
         return genericEvaluate(toggleKey, user, defaultValue, Boolean.class);
     }
 
+    /**
+     * Get the evaluated value of a string toggle
+     * @param toggleKey
+     * @param user {@link FPUser}
+     * @param defaultValue
+     * @return
+     */
     public String stringValue(String toggleKey, FPUser user, String defaultValue) {
         return genericEvaluate(toggleKey, user, defaultValue, String.class);
     }
 
+    /**
+     * Get the evaluated value of a number toggle
+     * @param toggleKey
+     * @param user {@link FPUser}
+     * @param defaultValue
+     * @return
+     */
     public double numberValue(String toggleKey, FPUser user, double defaultValue) {
         return genericEvaluate(toggleKey, user, defaultValue, Double.class);
     }
 
+    /**
+     * Get the evaluated value of a json toggle
+     * @param toggleKey
+     * @param user {@link FPUser}
+     * @param defaultValue
+     * @param clazz
+     * @param <T>
+     * @return
+     */
     public <T> T jsonValue(String toggleKey, FPUser user, T defaultValue, Class<T> clazz) {
         return jsonEvaluate(toggleKey, user, defaultValue, clazz);
     }
 
+    /**
+     * Get detailed evaluation results of boolean toggle
+     * @param toggleKey
+     * @param user {@link FPUser}
+     * @param defaultValue
+     * @return
+     */
     public FPDetail<Boolean> boolDetail(String toggleKey, FPUser user, boolean defaultValue) {
         return genericEvaluateDetail(toggleKey, user, defaultValue, Boolean.class);
     }
 
+    /**
+     * Get detailed evaluation results of string toggle
+     * @param toggleKey
+     * @param user {@link FPUser}
+     * @param defaultValue
+     * @return
+     */
     public FPDetail<String> stringDetail(String toggleKey, FPUser user, String defaultValue) {
         return genericEvaluateDetail(toggleKey, user, defaultValue, String.class);
     }
 
+    /**
+     * Get detailed evaluation results of number toggle
+     * @param toggleKey
+     * @param user {@link FPUser}
+     * @param defaultValue
+     * @return
+     */
     public FPDetail<Double> numberDetail(String toggleKey, FPUser user, double defaultValue) {
         return genericEvaluateDetail(toggleKey, user, defaultValue, Double.class);
     }
 
+    /**
+     * Get detailed evaluation results of json toggle
+     * @param toggleKey
+     * @param user {@link FPUser}
+     * @param defaultValue
+     * @param clazz
+     * @param <T>
+     * @return
+     */
     public <T> FPDetail<T> jsonDetail(String toggleKey, FPUser user, T defaultValue, Class<T> clazz) {
         return jsonEvaluateDetail(toggleKey, user, defaultValue, clazz);
     }
 
+    /**
+     * Manually events push
+     */
     public void flush() {
         eventProcessor.flush();
+    }
+
+    public void close() throws IOException {
+        eventProcessor.shutdown();
+        synchronizer.close();
+        dataRepository.close();
     }
 
     private <T> T jsonEvaluate(String toggleKey, FPUser user, T defaultValue, Class<T> clazz) {
