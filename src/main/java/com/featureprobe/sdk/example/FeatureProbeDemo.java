@@ -46,7 +46,7 @@ public class FeatureProbeDemo {
         System.out.println("detail:" + isOpenDetail.getReason());
         System.out.println("rule index:" + isOpenDetail.getRuleIndex());
 
-        fpClient.close();
+        //fpClient.close();
 
     }
 
