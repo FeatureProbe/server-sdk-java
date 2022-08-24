@@ -42,6 +42,10 @@ public class DefaultEventProcessor implements EventProcessor {
 
     private final ExecutorService executor;
 
+    final EventRepository eventRepository = new EventRepository();
+
+    FPContext context;
+
     private static final String LOG_SENDER_ERROR = "Unexpected error from event sender";
     private static final String LOG_BUSY_EVENT = "Event processing is busy, some will be dropped";
 
@@ -53,16 +57,15 @@ public class DefaultEventProcessor implements EventProcessor {
             .build();
 
     DefaultEventProcessor(FPContext context) {
+        this.context = context;
         eventQueue = new ArrayBlockingQueue<>(capacity);
         executor = new ThreadPoolExecutor(1, 5, 30, TimeUnit.SECONDS,
                 new ArrayBlockingQueue<>(100), threadFactory);
-        final EventRepository eventRepository = new EventRepository();
         Thread eventHandleThread = threadFactory.newThread(() -> {
             handleEvent(context, eventQueue, eventRepository);
         });
         eventHandleThread.setDaemon(true);
         eventHandleThread.start();
-
         Runnable flusher = this::flush;
         scheduler = Executors.newSingleThreadScheduledExecutor(threadFactory);
         scheduler.scheduleAtFixedRate(flusher, 0L, 5, TimeUnit.SECONDS);
@@ -89,10 +92,7 @@ public class DefaultEventProcessor implements EventProcessor {
 
     @Override
     public void shutdown() {
-        if (closed.compareAndSet(false, true)) {
-            eventQueue.offer(new EventAction(EventActionType.FLUSH, null));
-            eventQueue.offer(new EventAction(EventActionType.SHUTDOWN, null));
-        }
+        doShutdown();
     }
 
     private void handleEvent(FPContext context, BlockingQueue<EventAction> eventQueue,
@@ -125,7 +125,17 @@ public class DefaultEventProcessor implements EventProcessor {
     }
 
     private void doShutdown() {
-        scheduler.shutdown();
+        if (closed.compareAndSet(false, true)) {
+
+            try {
+                processFlush(context, eventRepository);
+                scheduler.awaitTermination(1000, TimeUnit.MILLISECONDS);
+                executor.awaitTermination(2000, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                logger.error("FeatureProbe shutdown error", e);
+            }
+
+        }
     }
 
     private void processEvent(Event event, EventRepository eventRepository) {

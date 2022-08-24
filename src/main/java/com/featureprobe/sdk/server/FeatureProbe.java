@@ -167,6 +167,10 @@ public final class FeatureProbe {
         eventProcessor.flush();
     }
 
+    /**
+     * Safely shut down FeatureProbe instance
+     * @throws IOException
+     */
     public void close() throws IOException {
         eventProcessor.shutdown();
         synchronizer.close();

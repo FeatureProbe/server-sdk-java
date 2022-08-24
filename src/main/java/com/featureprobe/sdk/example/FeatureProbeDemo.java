@@ -4,8 +4,7 @@ import com.featureprobe.sdk.server.FPConfig;
 import com.featureprobe.sdk.server.FPDetail;
 import com.featureprobe.sdk.server.FPUser;
 import com.featureprobe.sdk.server.FeatureProbe;
-import java.net.MalformedURLException;
-import java.time.Duration;
+import java.io.IOException;
 import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
@@ -19,7 +18,7 @@ public class FeatureProbeDemo {
     // Server Side SDK Key for your project and environment
     public static final String FEATURE_PROBE_SERVER_SDK_KEY = "server-8ed48815ef044428826787e9a238b9c6a479f98c";
 
-    public static void main(String[] args) throws MalformedURLException, InterruptedException {
+    public static void main(String[] args) throws IOException, InterruptedException {
 
         Logger root = (Logger)LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
         root.setLevel(Level.WARN);
@@ -46,7 +45,7 @@ public class FeatureProbeDemo {
         System.out.println("detail:" + isOpenDetail.getReason());
         System.out.println("rule index:" + isOpenDetail.getRuleIndex());
 
-        //fpClient.close();
+        fpClient.close();
 
     }
 
