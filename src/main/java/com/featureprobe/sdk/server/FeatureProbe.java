@@ -6,7 +6,9 @@ import com.featureprobe.sdk.server.model.Segment;
 import com.featureprobe.sdk.server.model.Toggle;
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.ThreadUtils;
 import org.slf4j.Logger;
+import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -30,6 +32,8 @@ public final class FeatureProbe {
     @VisibleForTesting
     final DataRepository dataRepository;
 
+    Synchronizer synchronizer;
+
     @VisibleForTesting
     EventProcessor eventProcessor;
 
@@ -43,25 +47,26 @@ public final class FeatureProbe {
 
     /**
      * Creates a new client instance that connects to FeatureProbe with the default configuration.
-     * @param sdkKey for your FeatureProbe environment
+     * @param serverSDKKey for your FeatureProbe environment
      */
-    public FeatureProbe(String sdkKey) {
-        this(sdkKey, FPConfig.DEFAULT);
+    public FeatureProbe(String serverSDKKey) {
+        this(serverSDKKey, FPConfig.DEFAULT);
     }
 
     /**
      * Creates a new client to connect to FeatureProbe with a custom configuration.
-     * @param sdkKey for your FeatureProbe environment
+     * @param serverSDKKey for your FeatureProbe environment
      * @param config the configuration control FeatureProbe client behavior
      */
-    public FeatureProbe(String sdkKey, FPConfig config) {
-        if (StringUtils.isBlank(sdkKey)) {
-            throw new IllegalArgumentException("sdkKey must not be blank");
+    public FeatureProbe(String serverSDKKey, FPConfig config) {
+        if (StringUtils.isBlank(serverSDKKey)) {
+            throw new IllegalArgumentException("serverSDKKey must not be blank");
         }
-        final FPContext context = new FPContext(sdkKey, config);
-        eventProcessor = config.eventProcessorFactory.createEventProcessor(context);
+        final FPContext context = new FPContext(serverSDKKey, config);
+        this.eventProcessor = config.eventProcessorFactory.createEventProcessor(context);
         this.dataRepository = config.dataRepositoryFactory.createDataRepository(context);
-        config.synchronizerFactory.createSynchronizer(context, dataRepository).sync();
+        this.synchronizer = config.synchronizerFactory.createSynchronizer(context, dataRepository);
+        this.synchronizer.sync();
     }
 
     /**
@@ -161,6 +166,12 @@ public final class FeatureProbe {
      */
     public void flush() {
         eventProcessor.flush();
+    }
+
+    public void close() throws IOException {
+        eventProcessor.shutdown();
+        synchronizer.close();
+        dataRepository.close();
     }
 
     private <T> T jsonEvaluate(String toggleKey, FPUser user, T defaultValue, Class<T> clazz) {

@@ -15,7 +15,7 @@ public class FPUser {
 
     /**
      * Creates a new FPUser
-     * @param key unique identifier
+     * @param key user unique id for percentage rollout
      */
     public FPUser(String key) {
         this.key = key;
@@ -33,7 +33,7 @@ public class FPUser {
     }
 
     /**
-     * Check property exists
+     * Check attribute exists
      * @param name attribute name
      * @return
      */
