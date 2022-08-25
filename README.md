@@ -15,7 +15,7 @@ Reading the short [Introduction](https://docs.featureprobe.io/sdk/sdk-introducti
 
 ## How to Use This SDK
 
-See [SDK Doc](https://docs.featureprobe.io/sdk/Server-Side%20SDKs/java-sdk) for detail.[中文](https://docs.featureprobe.io/zh-CN/sdk/Server-Side%20SDKs/java-sdk)
+See [SDK Doc](https://docs.featureprobe.io/sdk/Server-Side%20SDKs/java-sdk) for detail.  [中文](https://docs.featureprobe.io/zh-CN/sdk/Server-Side%20SDKs/java-sdk)
 
 ## Contributing
 
