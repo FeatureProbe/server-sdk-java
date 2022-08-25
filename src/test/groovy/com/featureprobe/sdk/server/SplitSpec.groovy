@@ -27,13 +27,13 @@ class SplitSpec extends Specification {
         }
     }
 
-    def "user not has unique key "() {
+    def "User not has key"() {
         when:
         user = new FPUser()
         def result1 = split.findIndex(user, "test_toggle_key")
-        def key1 = user.getKey()
+        def key1 = user.key
         def result2 = split.findIndex(user, "test_toggle_key")
-        def key2 = user.getKey()
+        def key2 = user.key
         then:
         key1 == key2
         result1.index.get() == result2.index.get()
