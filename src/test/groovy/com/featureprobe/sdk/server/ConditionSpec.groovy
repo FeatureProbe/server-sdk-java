@@ -16,7 +16,7 @@ class ConditionSpec extends Specification {
         condition = new Condition()
         condition.setType(ConditionType.STRING)
         condition.setSubject("userId")
-        user = new FPUser("test_user")
+        user = new FPUser().stableRollout("test_user")
         segments = ["test_project\$test_segment": new Segment(uniqueId: "test_project\$test_segment", version: 1,
                 rules: [new SegmentRule(conditions: [new Condition(type: ConditionType.STRING, subject: "userId",
                         predicate: PredicateType.IS_ONE_OF, objects: ["1", "2"])])])]

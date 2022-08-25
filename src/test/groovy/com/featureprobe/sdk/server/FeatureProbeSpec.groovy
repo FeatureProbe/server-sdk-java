@@ -63,7 +63,7 @@ class FeatureProbeSpec extends Specification {
                 def caseName = testCase.get("name").asText()
                 println("starting execute scenario : " + name + ",case : " + caseName)
                 def userCase = testCase.get("user")
-                FPUser user = new FPUser(userCase.get("key").asText())
+                FPUser user = new FPUser().stableRollout(userCase.get("key").asText())
                 def customValues = userCase.get("customValues").asList()
                 for (int x = 0; x < customValues.size(); x++) {
                     def customValue = customValues.get(x)

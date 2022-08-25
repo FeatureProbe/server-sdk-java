@@ -32,8 +32,9 @@ public class FeatureProbeDemo {
         final FeatureProbe fpClient = new FeatureProbe(FEATURE_PROBE_SERVER_SDK_KEY, config);
 
         // Create one user.
-        FPUser user = new FPUser("00001")   // key is for percentage rollout, normally use userId as key
-            .with("userId", "00001");            // "userId" is used in rules, should be filled in.
+        FPUser user = new FPUser()
+            .stableRollout("00001")          // key is for percentage rollout, normally use userId as key
+            .with("userId", "00001");        // "userId" is used in rules, should be filled in.
 
         // Get toggle result for this user.
         final String YOUR_TOGGLE_KEY = "campaign_allow_list";

@@ -1,5 +1,8 @@
 package com.featureprobe.sdk.server;
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,16 +12,36 @@ import java.util.Map;
  */
 public class FPUser {
 
+    private static final Logger logger = Loggers.MAIN;
+
     private String key;
 
     private Map<String, String> attrs = new HashMap<>();
 
     /**
      * Creates a new FPUser
+     */
+    public FPUser() {}
+
+    /**
+     * Creates a new FPUser
      * @param key user unique id for percentage rollout
      */
+    @Deprecated
     public FPUser(String key) {
         this.key = key;
+    }
+
+    /**
+     * Set user unique id for percentage rollout
+     * @param key user unique id for percentage rollout
+     */
+    public FPUser stableRollout(String key) {
+        if (StringUtils.isBlank(key)) {
+            logger.warn("User unique id for percentage rollout is blank， FeatureProbe will Randomly generated。");
+        }
+        this.key = key;
+        return this;
     }
 
     /**
