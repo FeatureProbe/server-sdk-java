@@ -32,7 +32,6 @@ public class FeatureProbeDemo {
 
         // Create one user.
         FPUser user = new FPUser()
-            .stableRollout("00001")          // key is for percentage rollout, normally use userId as key
             .with("userId", "00001");        // "userId" is used in rules, should be filled in.
 
         // Get toggle result for this user.
