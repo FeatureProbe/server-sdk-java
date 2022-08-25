@@ -35,7 +35,7 @@ public class Split {
     }
 
     public HitResult findIndex(FPUser user, String toggleKey) {
-        String hashKey = StringUtils.isNoneEmpty(user.getKey()) ? user.getKey() : String.valueOf(System.nanoTime());
+        String hashKey = user.getKey() != null ? user.getKey() : String.valueOf(System.nanoTime());
         if (StringUtils.isNotBlank(bucketBy)) {
             if (user.containAttr(bucketBy)) {
                 hashKey = user.getAttr(bucketBy);
