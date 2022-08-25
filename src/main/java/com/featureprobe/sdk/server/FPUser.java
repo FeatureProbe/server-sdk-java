@@ -1,8 +1,5 @@
 package com.featureprobe.sdk.server;
-
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,8 +8,6 @@ import java.util.Map;
  * A collection of attributes that can affect toggle evaluation, usually corresponding to a user of your application.
  */
 public class FPUser {
-
-    private static final Logger logger = Loggers.MAIN;
 
     private String key;
 
