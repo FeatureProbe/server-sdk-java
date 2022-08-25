@@ -173,10 +173,10 @@ public final class FeatureProbe {
      * @throws IOException
      */
     public void close() throws IOException {
+        logger.info("Closing FeatureProbe Client。");
         eventProcessor.shutdown();
         synchronizer.close();
         dataRepository.close();
-        logger.info("FeatureProbe client has been closed safely。");
     }
 
     private <T> T jsonEvaluate(String toggleKey, FPUser user, T defaultValue, Class<T> clazz) {
