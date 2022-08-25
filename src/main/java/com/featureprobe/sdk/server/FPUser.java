@@ -60,6 +60,9 @@ public class FPUser {
      * @return key
      */
     public String getKey() {
+        if (key == null) {
+            this.key = String.valueOf(System.nanoTime());
+        }
         return key;
     }
 
