@@ -31,8 +31,11 @@ class SplitSpec extends Specification {
         when:
         user = new FPUser()
         def result1 = split.findIndex(user, "test_toggle_key")
+        def key1 = user.getKey()
         def result2 = split.findIndex(user, "test_toggle_key")
+        def key2 = user.getKey()
         then:
+        key1 == key2
         result1.index.get() == result2.index.get()
     }
 
