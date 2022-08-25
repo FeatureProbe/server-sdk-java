@@ -37,9 +37,6 @@ public class FPUser {
      * @param key user unique id for percentage rollout
      */
     public FPUser stableRollout(String key) {
-        if (StringUtils.isBlank(key)) {
-            logger.warn("User unique id for percentage rollout is blank， FeatureProbe will Randomly generated。");
-        }
         this.key = key;
         return this;
     }
