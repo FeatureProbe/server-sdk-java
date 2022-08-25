@@ -70,6 +70,7 @@ final class MemoryDataRepository implements DataRepository {
 
     @Override
     public void close() {
+        data = null;
         return;
     }
 }

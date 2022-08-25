@@ -167,7 +167,13 @@ public final class FeatureProbe {
         eventProcessor.flush();
     }
 
+
+    /**
+     * Safely shut down FeatureProbe instance
+     * @throws IOException
+     */
     public void close() throws IOException {
+        logger.info("Closing FeatureProbe Client。");
         eventProcessor.shutdown();
         synchronizer.close();
         dataRepository.close();
