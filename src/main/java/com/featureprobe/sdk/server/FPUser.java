@@ -1,5 +1,4 @@
 package com.featureprobe.sdk.server;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,10 +14,25 @@ public class FPUser {
 
     /**
      * Creates a new FPUser
+     */
+    public FPUser() {}
+
+    /**
+     * Creates a new FPUser
      * @param key user unique id for percentage rollout
      */
+    @Deprecated
     public FPUser(String key) {
         this.key = key;
+    }
+
+    /**
+     * Set user unique id for percentage rollout
+     * @param key user unique id for percentage rollout
+     */
+    public FPUser stableRollout(String key) {
+        this.key = key;
+        return this;
     }
 
     /**

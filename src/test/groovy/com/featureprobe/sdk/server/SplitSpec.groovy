@@ -10,7 +10,7 @@ class SplitSpec extends Specification {
 
     def setup() {
         split = new Split([[[0, 5000]], [[5000, 10000]]])
-        user = new FPUser("test_user_key")
+        user = new FPUser().stableRollout("test_user_key")
     }
 
     def "Get user group"() {

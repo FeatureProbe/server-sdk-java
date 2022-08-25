@@ -9,7 +9,7 @@ class AccessRecorderSpec extends Specification {
 
     def setup() {
         accessRecorder = new AccessRecorder()
-        FPUser user = new FPUser("test_user")
+        FPUser user = new FPUser().stableRollout("test_user")
         event = new AccessEvent(System.currentTimeMillis(), user, "test_toggle", "true", 1, 0)
     }
 
