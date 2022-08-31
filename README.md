@@ -1,10 +1,9 @@
-# FeatureProbe Server Side SDK for Golang 
+# FeatureProbe Server Side SDK for Java
 
-[![Top Language](https://img.shields.io/github/languages/top/FeatureProbe/server-sdk-go)](https://github.com/FeatureProbe/server-sdk-go/search?l=go)
-[![codecov](https://codecov.io/gh/featureprobe/server-sdk-go/branch/main/graph/badge.svg?token=TAN3AU4CK2)](https://codecov.io/gh/featureprobe/server-sdk-go)
-[![Github Star](https://img.shields.io/github/stars/FeatureProbe/server-sdk-go)](https://github.com/FeatureProbe/server-sdk-go/stargazers)
-[![Apache-2.0 license](https://img.shields.io/github/license/FeatureProbe/FeatureProbe)](https://github.com/FeatureProbe/FeatureProbe/blob/main/LICENSE)
-
+[![Maven Central](https://img.shields.io/maven-central/v/com.featureprobe/server-sdk-java)](https://search.maven.org/artifact/com.featureprobe/server-sdk-java)
+[![codecov](https://codecov.io/gh/FeatureProbe/server-sdk-java/branch/main/graph/badge.svg?token=WZC3ZS6NNL)](https://codecov.io/gh/FeatureProbe/server-sdk-java)
+[![GitHub Star](https://img.shields.io/github/stars/FeatureProbe/server-sdk-java)](https://github.com/FeatureProbe/server-sdk-java/stargazers)
+[![License](https://img.shields.io/github/license/FeatureProbe/server-sdk-java)](https://github.com/FeatureProbe/server-sdk-java/blob/main/LICENSE)
 
 Feature Probe is an open source feature management service. This SDK is used to control features in java programs. This
 SDK is designed primarily for use in multi-user systems such as web servers and applications.
@@ -16,7 +15,7 @@ Reading the short [Introduction](https://docs.featureprobe.io/sdk/sdk-introducti
 
 ## How to Use This SDK
 
-See [SDK Doc](https://docs.featureprobe.io/sdk/Server-Side%20SDKs/golang-sdk) for detail.  [中文](https://docs.featureprobe.io/zh-CN/sdk/Server-Side%20SDKs/golang-sdk)
+See [SDK Doc](https://docs.featureprobe.io/sdk/Server-Side%20SDKs/java-sdk) for detail.  [中文](https://docs.featureprobe.io/zh-CN/sdk/Server-Side%20SDKs/java-sdk)
 
 ## Contributing
 
