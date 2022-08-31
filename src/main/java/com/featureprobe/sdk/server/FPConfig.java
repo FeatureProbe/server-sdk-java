@@ -6,7 +6,7 @@ import java.time.Duration;
 
 public final class FPConfig {
 
-    static final URI DEFAULT_REMOTE_URI = URI.create("http://127.0.0.1:4007");
+    static final URI DEFAULT_REMOTE_URI = URI.create("http://localhost:4009/server");
 
     static final Duration DEFAULT_INTERVAL = Duration.ofSeconds(5);
 

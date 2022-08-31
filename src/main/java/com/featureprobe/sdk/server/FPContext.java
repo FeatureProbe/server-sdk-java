@@ -3,11 +3,12 @@ package com.featureprobe.sdk.server;
 import okhttp3.Headers;
 import org.slf4j.Logger;
 
-import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
 import java.util.Objects;
+import java.util.Properties;
 
 final class FPContext {
 
@@ -58,12 +59,7 @@ final class FPContext {
         this.refreshInterval = config.refreshInterval;
         this.location = config.location;
         this.httpConfiguration = config.httpConfiguration;
-        String sdkVersion = DEFAULT_SDK_VERSION;
-        try {
-            sdkVersion = Utils.readSdkVersion();
-        } catch (IOException e) {
-            logger.error("read sdk version error", e);
-        }
+        String sdkVersion = getVersion();
         this.headers = config.httpConfiguration.headers.newBuilder()
                 .add(GET_SDK_KEY_HEADER, serverSdkKey)
                 .add(USER_AGENT_HEADER, SDK_FLAG_PREFIX + sdkVersion)
@@ -97,4 +93,33 @@ final class FPContext {
     public Headers getHeaders() {
         return headers;
     }
+
+    private synchronized String getVersion() {
+        String version = null;
+        try {
+            Properties p = new Properties();
+            InputStream is = getClass()
+                    .getResourceAsStream("/META-INF/maven/com.featureprobe/server-sdk-java/pom.properties");
+            if (is != null) {
+                p.load(is);
+                version = p.getProperty("version", "");
+            }
+        } catch (Exception e) {
+
+        }
+        if (version == null) {
+            Package aPackage = getClass().getPackage();
+            if (aPackage != null) {
+                version = aPackage.getImplementationVersion();
+                if (version == null) {
+                    version = aPackage.getSpecificationVersion();
+                }
+            }
+        }
+        if (version == null) {
+            version = "";
+        }
+        return version;
+    }
+
 }
