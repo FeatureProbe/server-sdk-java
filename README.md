@@ -10,12 +10,12 @@ SDK is designed primarily for use in multi-user systems such as web servers and 
 
 ## Basic Terms
 
-Reading the short [Introduction](https://docs.featureprobe.io/sdk/sdk-introduction) will help to understand the code blow more easily.  [中文](https://docs.featureprobe.io/zh-CN/sdk/sdk-introduction)
+Reading the short [Introduction](https://docs.featureprobe.io/sdk/sdk-introduction) will help to understand the code blow more easily.  [中文](https://docs.featureprobe.io/zh-CN/reference/sdk-introduction)
 
 
 ## How to Use This SDK
 
-See [SDK Doc](https://docs.featureprobe.io/sdk/Server-Side%20SDKs/java-sdk) for detail.  [中文](https://docs.featureprobe.io/zh-CN/sdk/Server-Side%20SDKs/java-sdk)
+See [SDK Doc](https://docs.featureprobe.io/sdk/Server-Side%20SDKs/java-sdk) for detail.  [中文](https://docs.featureprobe.io/zh-CN/how-to/Server-Side%20SDKs/java-sdk)
 
 ## Contributing
 
