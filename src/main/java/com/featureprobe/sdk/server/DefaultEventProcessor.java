@@ -44,6 +44,8 @@ public class DefaultEventProcessor implements EventProcessor {
 
     final EventRepository eventRepository = new EventRepository();
 
+    final List<EventAction> actions = new ArrayList<>(EVENT_BATCH_HANDLE_SIZE);
+
     FPContext context;
 
     private static final String LOG_SENDER_ERROR = "Unexpected error from event sender";
@@ -97,7 +99,6 @@ public class DefaultEventProcessor implements EventProcessor {
 
     private void handleEvent(FPContext context, BlockingQueue<EventAction> eventQueue,
                              EventRepository eventRepository) {
-        List<EventAction> actions = new ArrayList<>(EVENT_BATCH_HANDLE_SIZE);
         while (!closed.get() || !eventQueue.isEmpty()) {
             try {
                 actions.clear();
@@ -125,10 +126,10 @@ public class DefaultEventProcessor implements EventProcessor {
     }
 
     private void doShutdown() {
+        flush();
         if (closed.compareAndSet(false, true)) {
-
             try {
-                processFlush(context, eventRepository);
+                waitTaskDone(2, TimeUnit.SECONDS);
                 scheduler.awaitTermination(1000, TimeUnit.MILLISECONDS);
                 executor.awaitTermination(2000, TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
@@ -137,6 +138,17 @@ public class DefaultEventProcessor implements EventProcessor {
 
         }
     }
+
+    private void waitTaskDone(long timeout, TimeUnit unit) {
+        long startNanos = System.nanoTime();
+        while (!eventQueue.isEmpty() && !actions.isEmpty()) {
+            long nanos = unit.toNanos(timeout);
+            if (System.nanoTime() - startNanos > nanos) {
+                break;
+            }
+        }
+    }
+
 
     private void processEvent(Event event, EventRepository eventRepository) {
         eventRepository.add(event);
