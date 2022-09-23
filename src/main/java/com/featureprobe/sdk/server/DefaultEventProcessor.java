@@ -42,6 +42,8 @@ public class DefaultEventProcessor implements EventProcessor {
 
     private final ExecutorService executor;
 
+    private final Thread eventHandleThread;
+
     final EventRepository eventRepository = new EventRepository();
 
     final List<EventAction> actions = new ArrayList<>(EVENT_BATCH_HANDLE_SIZE);
@@ -63,7 +65,7 @@ public class DefaultEventProcessor implements EventProcessor {
         eventQueue = new ArrayBlockingQueue<>(capacity);
         executor = new ThreadPoolExecutor(1, 5, 30, TimeUnit.SECONDS,
                 new ArrayBlockingQueue<>(100), threadFactory);
-        Thread eventHandleThread = threadFactory.newThread(() -> {
+        eventHandleThread = threadFactory.newThread(() -> {
             handleEvent(context, eventQueue, eventRepository);
         });
         eventHandleThread.setDaemon(true);
@@ -94,6 +96,7 @@ public class DefaultEventProcessor implements EventProcessor {
 
     @Override
     public void shutdown() {
+        flush();
         doShutdown();
     }
 
@@ -126,10 +129,9 @@ public class DefaultEventProcessor implements EventProcessor {
     }
 
     private void doShutdown() {
-        flush();
         if (closed.compareAndSet(false, true)) {
             try {
-                waitTaskDone(2, TimeUnit.SECONDS);
+                eventHandleThread.join(2000);
                 scheduler.awaitTermination(1000, TimeUnit.MILLISECONDS);
                 executor.awaitTermination(2000, TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
@@ -138,17 +140,6 @@ public class DefaultEventProcessor implements EventProcessor {
 
         }
     }
-
-    private void waitTaskDone(long timeout, TimeUnit unit) {
-        long startNanos = System.nanoTime();
-        while (!eventQueue.isEmpty() && !actions.isEmpty()) {
-            long nanos = unit.toNanos(timeout);
-            if (System.nanoTime() - startNanos > nanos) {
-                break;
-            }
-        }
-    }
-
 
     private void processEvent(Event event, EventRepository eventRepository) {
         eventRepository.add(event);
