@@ -3,6 +3,7 @@ package com.featureprobe.sdk.server;
 import java.net.URI;
 import java.net.URL;
 import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 public final class FPConfig {
 
@@ -10,9 +11,14 @@ public final class FPConfig {
 
     static final Duration DEFAULT_INTERVAL = Duration.ofSeconds(5);
 
+    static final Long DEFAULT_START_WAIT = TimeUnit.SECONDS.toNanos(5);
+
     protected static final FPConfig DEFAULT = new Builder().build();
 
+
     final Duration refreshInterval;
+
+    final Long startWait;
 
     final URI remoteUri;
 
@@ -43,6 +49,7 @@ public final class FPConfig {
                 builder.httpConfiguration;
         this.synchronizerUrl = builder.synchronizerUrl;
         this.eventUrl = builder.eventUrl;
+        this.startWait = builder.startWait == null ? DEFAULT_START_WAIT : builder.startWait;
     }
 
     public static Builder builder() {
@@ -66,6 +73,8 @@ public final class FPConfig {
         private URL synchronizerUrl;
 
         private URL eventUrl;
+
+        private Long startWait;
 
         public Builder() {
         }
@@ -115,6 +124,11 @@ public final class FPConfig {
 
         public Builder eventUrl(URL eventUrl) {
             this.eventUrl = eventUrl;
+            return this;
+        }
+
+        public Builder startWait(Long startWaitTime, TimeUnit unit) {
+            this.startWait = unit.toNanos(startWaitTime);
             return this;
         }
 

@@ -30,6 +30,7 @@ final class PollingSynchronizer implements Synchronizer {
     private volatile ScheduledFuture<?> worker;
     private final OkHttpClient httpClient;
     private final Headers headers;
+    private Long startWait;
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(
             new ThreadFactoryBuilder()
                     .setDaemon(true)
@@ -41,6 +42,7 @@ final class PollingSynchronizer implements Synchronizer {
         this.refreshInterval = context.getRefreshInterval();
         this.apiUrl = context.getSynchronizerUrl();
         this.dataRepository = dataRepository;
+        this.startWait = context.getStartWait();
         OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .connectionPool(context.getHttpConfiguration().connectionPool)
                 .connectTimeout(context.getHttpConfiguration().connectTimeout)
@@ -54,11 +56,16 @@ final class PollingSynchronizer implements Synchronizer {
     @Override
     public void sync() {
         logger.info("starting FeatureProbe polling repository with interval {} ms", refreshInterval.toMillis());
-        poll();
         synchronized (this) {
             if (worker == null) {
                 worker = scheduler.scheduleAtFixedRate(this::poll, 0L, refreshInterval.toMillis(),
                         TimeUnit.MILLISECONDS);
+            }
+        }
+        long startNanos = System.nanoTime();
+        while (!dataRepository.initialized()) {
+            if(System.nanoTime() - startNanos > startWait){
+                break;
             }
         }
     }
@@ -83,7 +90,8 @@ final class PollingSynchronizer implements Synchronizer {
         try (Response response = httpClient.newCall(request).execute()) {
             String body = response.body().string();
             if (!response.isSuccessful()) {
-                throw new HttpErrorException("Http request error: " + response.code());
+                throw new HttpErrorException(String.format("Http request error: code: {}, body: {}:" + response.code(),
+                        response.body()));
             }
             logger.debug("Http response: {}", response);
             logger.debug("Http response body: {}", body);

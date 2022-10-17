@@ -179,6 +179,14 @@ public final class FeatureProbe {
         dataRepository.close();
     }
 
+    /**
+     * Get FeatureProbe instance initial state
+     * @return
+     */
+    public boolean initialized() {
+        return dataRepository.initialized();
+    }
+
     private <T> T jsonEvaluate(String toggleKey, FPUser user, T defaultValue, Class<T> clazz) {
         try {
             Toggle toggle = dataRepository.getToggle(toggleKey);

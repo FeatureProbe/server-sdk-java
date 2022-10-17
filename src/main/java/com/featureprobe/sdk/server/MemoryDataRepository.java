@@ -4,8 +4,6 @@ import com.featureprobe.sdk.server.model.Repository;
 import com.featureprobe.sdk.server.model.Segment;
 import com.featureprobe.sdk.server.model.Toggle;
 import com.google.common.collect.ImmutableMap;
-
-import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 
@@ -71,6 +69,5 @@ final class MemoryDataRepository implements DataRepository {
     @Override
     public void close() {
         data = null;
-        return;
     }
 }
