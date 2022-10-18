@@ -101,10 +101,10 @@ class ConditionSpec extends Specification {
     def "[matches invalid regex] string condition match"() {
         when:
         condition.setObjects(["\\\\\\"])
-        condition.setPredicate(PredicateType.MATCHES_REGEX)
         user.with("userId", "13797347245")
+        condition.setPredicate(PredicateType.MATCHES_REGEX)
         def hitMiss = condition.matchObjects(user, segments)
-        user.with("userId", "122122")
+        condition.setPredicate(PredicateType.DOES_NOT_MATCH_REGEX)
         def hitMiss2 = condition.matchObjects(user, segments)
 
         then:
