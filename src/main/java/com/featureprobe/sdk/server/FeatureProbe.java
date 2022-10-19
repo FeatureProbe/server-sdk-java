@@ -11,6 +11,9 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * A client for the FeatureProbe API. Client instances are thread-safe.
@@ -65,7 +68,17 @@ public final class FeatureProbe {
         this.eventProcessor = config.eventProcessorFactory.createEventProcessor(context);
         this.dataRepository = config.dataRepositoryFactory.createDataRepository(context);
         this.synchronizer = config.synchronizerFactory.createSynchronizer(context, dataRepository);
-        this.synchronizer.sync();
+        Future<Void> startFuture = this.synchronizer.sync();
+        try {
+            startFuture.get(config.startWait, TimeUnit.NANOSECONDS);
+        } catch (TimeoutException e) {
+            logger.error("Timeout encountered waiting for FeatureProbe client initialization");
+        } catch (Exception e) {
+            logger.error("Exception encountered waiting for FeatureProbe client initialization", e);
+        }
+        if (!this.dataRepository.initialized()) {
+            logger.warn("FeatureProbe client was not successfully initialized");
+        }
     }
 
     /**

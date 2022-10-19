@@ -40,8 +40,6 @@ final class FPContext {
 
     private final Headers headers;
 
-    private final Long startWait;
-
     FPContext(String serverSdkKey, FPConfig config) {
         try {
             if (Objects.isNull(config.synchronizerUrl)) {
@@ -57,7 +55,6 @@ final class FPContext {
         } catch (MalformedURLException e) {
             logger.error("construction context error", e);
         }
-        this.startWait = config.startWait;
         this.serverSdkKey = serverSdkKey;
         this.refreshInterval = config.refreshInterval;
         this.location = config.location;
@@ -123,9 +120,5 @@ final class FPContext {
             version = "";
         }
         return version;
-    }
-
-    public Long getStartWait() {
-        return startWait;
     }
 }

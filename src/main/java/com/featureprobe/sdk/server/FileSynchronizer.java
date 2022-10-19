@@ -8,12 +8,15 @@ import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 final class FileSynchronizer implements Synchronizer {
 
     private static final Logger logger = Loggers.SYNCHRONIZER;
+
+    private final CompletableFuture<Void> initFuture;
 
     DataRepository dataRepository;
 
@@ -25,11 +28,12 @@ final class FileSynchronizer implements Synchronizer {
 
     FileSynchronizer(DataRepository dataRepository, String location) {
         this.dataRepository = dataRepository;
+        this.initFuture = new CompletableFuture<>();
         this.location = location == null ? DEFAULT_LOCATION : location;
     }
 
     @Override
-    public void sync() {
+    public Future<Void> sync() {
         try (InputStream is = getClass().getClassLoader().getResourceAsStream(location)) {
             String data;
             if (is == null) {
@@ -44,11 +48,11 @@ final class FileSynchronizer implements Synchronizer {
         } catch (IOException e) {
             logger.error("repository file resource not found in classpath: {}", location, e);
         }
+        return initFuture;
     }
 
     @Override
     public void close() throws IOException {
-        return;
     }
 
 }

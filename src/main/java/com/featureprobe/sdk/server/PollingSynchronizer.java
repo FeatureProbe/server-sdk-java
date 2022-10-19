@@ -14,7 +14,9 @@ import org.slf4j.Logger;
 import java.io.IOException;
 import java.net.URL;
 import java.time.Duration;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -30,7 +32,9 @@ final class PollingSynchronizer implements Synchronizer {
     private volatile ScheduledFuture<?> worker;
     private final OkHttpClient httpClient;
     private final Headers headers;
-    private Long startWait;
+
+    private final CompletableFuture<Void> initFuture;
+
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(
             new ThreadFactoryBuilder()
                     .setDaemon(true)
@@ -42,7 +46,7 @@ final class PollingSynchronizer implements Synchronizer {
         this.refreshInterval = context.getRefreshInterval();
         this.apiUrl = context.getSynchronizerUrl();
         this.dataRepository = dataRepository;
-        this.startWait = context.getStartWait();
+        this.initFuture = new CompletableFuture<>();
         OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .connectionPool(context.getHttpConfiguration().connectionPool)
                 .connectTimeout(context.getHttpConfiguration().connectTimeout)
@@ -54,7 +58,7 @@ final class PollingSynchronizer implements Synchronizer {
     }
 
     @Override
-    public void sync() {
+    public Future<Void> sync() {
         logger.info("starting FeatureProbe polling repository with interval {} ms", refreshInterval.toMillis());
         synchronized (this) {
             if (worker == null) {
@@ -62,12 +66,7 @@ final class PollingSynchronizer implements Synchronizer {
                         TimeUnit.MILLISECONDS);
             }
         }
-        long startNanos = System.nanoTime();
-        while (!dataRepository.initialized()) {
-            if(System.nanoTime() - startNanos > startWait){
-                break;
-            }
-        }
+        return initFuture;
     }
 
     @Override
@@ -98,6 +97,7 @@ final class PollingSynchronizer implements Synchronizer {
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             Repository repository = mapper.readValue(body, Repository.class);
             dataRepository.refresh(repository);
+            this.initFuture.complete(null);
         } catch (Exception e) {
             logger.error("Unexpected error from polling processor", e);
         }
