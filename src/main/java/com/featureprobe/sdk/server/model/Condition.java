@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public final class Condition {
 
@@ -126,7 +127,12 @@ public final class Condition {
             return false;
         }
 
-        return stringMatcher.match(subjectValue, this.objects);
+        try {
+            return stringMatcher.match(subjectValue, this.objects);
+        } catch (PatternSyntaxException e) {
+            logger.error("Invalid regex pattern", e);
+            return false;
+        }
     }
 
     private boolean matchSegmentCondition(FPUser user, Map<String, Segment> segments) {
