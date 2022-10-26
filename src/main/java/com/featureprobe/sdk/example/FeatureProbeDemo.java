@@ -5,11 +5,17 @@ import com.featureprobe.sdk.server.FPDetail;
 import com.featureprobe.sdk.server.FPUser;
 import com.featureprobe.sdk.server.FeatureProbe;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
+import com.featureprobe.sdk.server.Loggers;
+import groovy.util.logging.Slf4j;
 import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 
 public class FeatureProbeDemo {
+
+    private static final org.slf4j.Logger logger = Loggers.MAIN;
 
     // FeatureProbe server URL for local docker
     private static final String FEATURE_PROBE_SERVER_URL = "http://localhost:4009/server"; // "https://featureprobe.io/server";
@@ -25,10 +31,15 @@ public class FeatureProbeDemo {
 
         final FPConfig config = FPConfig.builder()
             .remoteUri(FEATURE_PROBE_SERVER_URL)
+            .startWait(5L, TimeUnit.SECONDS)
             .build();
 
         // Init FeatureProbe, share this FeatureProbe instance in your project.
         final FeatureProbe fpClient = new FeatureProbe(FEATURE_PROBE_SERVER_SDK_KEY, config);
+
+        if (!fpClient.initialized()) {
+            logger.error("SDK failed to initialize!");
+        }
 
         // Create one user.
         FPUser user = new FPUser()
