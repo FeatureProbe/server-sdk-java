@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import com.featureprobe.sdk.server.Loggers;
-import groovy.util.logging.Slf4j;
 import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
