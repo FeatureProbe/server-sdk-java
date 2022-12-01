@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.featureprobe.sdk.example;
 
 import com.featureprobe.sdk.server.FPConfig;
@@ -19,19 +36,18 @@ public class FeatureProbeDemo {
     // FeatureProbe server URL for local docker
     private static final String FEATURE_PROBE_SERVER_URL = "http://localhost:4009/server"; // "https://featureprobe.io/server";
 
-
     // Server Side SDK Key for your project and environment
     public static final String FEATURE_PROBE_SERVER_SDK_KEY = "server-8ed48815ef044428826787e9a238b9c6a479f98c";
 
     public static void main(String[] args) throws IOException {
 
-        Logger root = (Logger)LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
+        Logger root = (Logger) LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
         root.setLevel(Level.WARN);
 
         final FPConfig config = FPConfig.builder()
-            .remoteUri(FEATURE_PROBE_SERVER_URL)
-            .startWait(5L, TimeUnit.SECONDS)
-            .build();
+                .remoteUri(FEATURE_PROBE_SERVER_URL)
+                .startWait(5L, TimeUnit.SECONDS)
+                .build();
 
         // Init FeatureProbe, share this FeatureProbe instance in your project.
         final FeatureProbe fpClient = new FeatureProbe(FEATURE_PROBE_SERVER_SDK_KEY, config);
@@ -42,7 +58,7 @@ public class FeatureProbeDemo {
 
         // Create one user.
         FPUser user = new FPUser()
-            .with("userId", "00001");        // "userId" is used in rules, should be filled in.
+                .with("userId", "00001"); // "userId" is used in rules, should be filled in.
 
         // Get toggle result for this user.
         final String YOUR_TOGGLE_KEY = "campaign_allow_list";

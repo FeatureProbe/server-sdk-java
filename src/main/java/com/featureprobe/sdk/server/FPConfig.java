@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.featureprobe.sdk.server;
 
 import java.net.URI;
@@ -14,7 +31,6 @@ public final class FPConfig {
     static final Long DEFAULT_START_WAIT = TimeUnit.SECONDS.toNanos(5);
 
     protected static final FPConfig DEFAULT = new Builder().build();
-
 
     final Duration refreshInterval;
 
@@ -40,13 +56,13 @@ public final class FPConfig {
         this.refreshInterval = builder.refreshInterval;
         this.remoteUri = builder.remoteUri;
         this.location = builder.location;
-        this.synchronizerFactory = builder.synchronizer == null ? new PollingSynchronizerFactory() :
-                builder.synchronizer;
-        this.dataRepositoryFactory = builder.dataRepository == null ? new MemoryDataRepositoryFactory() :
-                builder.dataRepository;
+        this.synchronizerFactory =
+                builder.synchronizer == null ? new PollingSynchronizerFactory() : builder.synchronizer;
+        this.dataRepositoryFactory =
+                builder.dataRepository == null ? new MemoryDataRepositoryFactory() : builder.dataRepository;
         this.eventProcessorFactory = new DefaultEventProcessorFactory();
-        this.httpConfiguration = builder.httpConfiguration == null ? HttpConfiguration.DEFAULT :
-                builder.httpConfiguration;
+        this.httpConfiguration =
+                builder.httpConfiguration == null ? HttpConfiguration.DEFAULT : builder.httpConfiguration;
         this.synchronizerUrl = builder.synchronizerUrl;
         this.eventUrl = builder.eventUrl;
         this.startWait = builder.startWait == null ? DEFAULT_START_WAIT : builder.startWait;

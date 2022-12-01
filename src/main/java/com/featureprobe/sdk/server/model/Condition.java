@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.featureprobe.sdk.server.model;
 
 import com.featureprobe.sdk.server.*;
@@ -35,62 +52,58 @@ public final class Condition {
 
     static {
 
-        stringMatchers.put(PredicateType.IS_ONE_OF, (target, objects) ->
-                objects.contains(target));
-        stringMatchers.put(PredicateType.ENDS_WITH, (target, objects) ->
-                objects.stream().anyMatch(target::endsWith));
-        stringMatchers.put(PredicateType.STARTS_WITH, (target, objects) ->
-                objects.stream().anyMatch(target::startsWith));
-        stringMatchers.put(PredicateType.CONTAINS, (target, objects) ->
-                objects.stream().anyMatch(target::contains));
-        stringMatchers.put(PredicateType.MATCHES_REGEX, (target, objects) ->
-                objects.stream().anyMatch(s -> Pattern.compile(s).matcher(target).find()));
-        stringMatchers.put(PredicateType.IS_NOT_ANY_OF, (target, objects) ->
-                !objects.contains(target));
-        stringMatchers.put(PredicateType.DOES_NOT_END_WITH, (target, objects) ->
-                objects.stream().noneMatch(target::endsWith));
-        stringMatchers.put(PredicateType.DOES_NOT_START_WITH, (target, objects) ->
-                objects.stream().noneMatch(target::startsWith));
-        stringMatchers.put(PredicateType.DOES_NOT_CONTAIN, (target, objects) ->
-                objects.stream().noneMatch(target::contains));
-        stringMatchers.put(PredicateType.DOES_NOT_MATCH_REGEX, (target, objects) ->
-                objects.stream().noneMatch(s -> Pattern.compile(s).matcher(target).find()));
+        stringMatchers.put(PredicateType.IS_ONE_OF, (target, objects) -> objects.contains(target));
+        stringMatchers.put(PredicateType.ENDS_WITH, (target, objects) -> objects.stream().anyMatch(target::endsWith));
+        stringMatchers.put(PredicateType.STARTS_WITH,
+                (target, objects) -> objects.stream().anyMatch(target::startsWith));
+        stringMatchers.put(PredicateType.CONTAINS, (target, objects) -> objects.stream().anyMatch(target::contains));
+        stringMatchers.put(PredicateType.MATCHES_REGEX,
+                (target, objects) -> objects.stream().anyMatch(s -> Pattern.compile(s).matcher(target).find()));
+        stringMatchers.put(PredicateType.IS_NOT_ANY_OF, (target, objects) -> !objects.contains(target));
+        stringMatchers.put(PredicateType.DOES_NOT_END_WITH,
+                (target, objects) -> objects.stream().noneMatch(target::endsWith));
+        stringMatchers.put(PredicateType.DOES_NOT_START_WITH,
+                (target, objects) -> objects.stream().noneMatch(target::startsWith));
+        stringMatchers.put(PredicateType.DOES_NOT_CONTAIN,
+                (target, objects) -> objects.stream().noneMatch(target::contains));
+        stringMatchers.put(PredicateType.DOES_NOT_MATCH_REGEX,
+                (target, objects) -> objects.stream().noneMatch(s -> Pattern.compile(s).matcher(target).find()));
 
-        segmentMatchers.put(PredicateType.IS_IN, (user, segments, objects) ->
-                objects.stream().anyMatch(s -> segments.get(s).contains(user, segments)));
-        segmentMatchers.put(PredicateType.IS_NOT_IN, (user, segments, objects) ->
-                objects.stream().noneMatch(s -> segments.get(s).contains(user, segments)));
+        segmentMatchers.put(PredicateType.IS_IN,
+                (user, segments, objects) -> objects.stream().anyMatch(s -> segments.get(s).contains(user, segments)));
+        segmentMatchers.put(PredicateType.IS_NOT_IN,
+                (user, segments, objects) -> objects.stream().noneMatch(s -> segments.get(s).contains(user, segments)));
 
-        datetimeMatchers.put(PredicateType.AFTER, ((target, objects) ->
-                objects.stream().map(Long::parseLong).anyMatch(o -> target >= o)));
-        datetimeMatchers.put(PredicateType.BEFORE, ((target, objects) ->
-                objects.stream().map(Long::parseLong).anyMatch(o -> target < o)));
+        datetimeMatchers.put(PredicateType.AFTER,
+                ((target, objects) -> objects.stream().map(Long::parseLong).anyMatch(o -> target >= o)));
+        datetimeMatchers.put(PredicateType.BEFORE,
+                ((target, objects) -> objects.stream().map(Long::parseLong).anyMatch(o -> target < o)));
 
-        numberMatchers.put(PredicateType.EQUAL_TO, ((target, objects) ->
-                objects.stream().map(Double::parseDouble).anyMatch(o -> target == o)));
-        numberMatchers.put(PredicateType.NOT_EQUAL_TO, ((target, objects) ->
-                objects.stream().map(Double::parseDouble).noneMatch(o -> target == o)));
-        numberMatchers.put(PredicateType.GREATER_THAN, ((target, objects) ->
-                objects.stream().map(Double::parseDouble).anyMatch(o -> target > o)));
-        numberMatchers.put(PredicateType.GREATER_OR_EQUAL, ((target, objects) ->
-                objects.stream().map(Double::parseDouble).anyMatch(o -> target >= o)));
-        numberMatchers.put(PredicateType.LESS_THAN, ((target, objects) ->
-                objects.stream().map(Double::parseDouble).anyMatch(o -> target < o)));
-        numberMatchers.put(PredicateType.LESS_OR_EQUAL, ((target, objects) ->
-                objects.stream().map(Double::parseDouble).anyMatch(o -> target <= o)));
+        numberMatchers.put(PredicateType.EQUAL_TO,
+                ((target, objects) -> objects.stream().map(Double::parseDouble).anyMatch(o -> target == o)));
+        numberMatchers.put(PredicateType.NOT_EQUAL_TO,
+                ((target, objects) -> objects.stream().map(Double::parseDouble).noneMatch(o -> target == o)));
+        numberMatchers.put(PredicateType.GREATER_THAN,
+                ((target, objects) -> objects.stream().map(Double::parseDouble).anyMatch(o -> target > o)));
+        numberMatchers.put(PredicateType.GREATER_OR_EQUAL,
+                ((target, objects) -> objects.stream().map(Double::parseDouble).anyMatch(o -> target >= o)));
+        numberMatchers.put(PredicateType.LESS_THAN,
+                ((target, objects) -> objects.stream().map(Double::parseDouble).anyMatch(o -> target < o)));
+        numberMatchers.put(PredicateType.LESS_OR_EQUAL,
+                ((target, objects) -> objects.stream().map(Double::parseDouble).anyMatch(o -> target <= o)));
 
-        semverMatchers.put(PredicateType.EQUAL_TO, ((target, objects) ->
-                objects.stream().filter(Objects::nonNull).map(ComparableVersion::new).anyMatch(t -> target.compareTo(t) == 0)));
-        semverMatchers.put(PredicateType.NOT_EQUAL_TO, ((target, objects) ->
-                objects.stream().filter(Objects::nonNull).map(ComparableVersion::new).noneMatch(t -> target.compareTo(t) == 0)));
-        semverMatchers.put(PredicateType.GREATER_THAN, ((target, objects) ->
-                objects.stream().filter(Objects::nonNull).map(ComparableVersion::new).anyMatch(t -> target.compareTo(t) > 0)));
-        semverMatchers.put(PredicateType.GREATER_OR_EQUAL, ((target, objects) ->
-                objects.stream().filter(Objects::nonNull).map(ComparableVersion::new).anyMatch(t -> target.compareTo(t) >= 0)));
-        semverMatchers.put(PredicateType.LESS_THAN, ((target, objects) ->
-                objects.stream().filter(Objects::nonNull).map(ComparableVersion::new).anyMatch(t -> target.compareTo(t) < 0)));
-        semverMatchers.put(PredicateType.LESS_OR_EQUAL, ((target, objects) ->
-                objects.stream().filter(Objects::nonNull).map(ComparableVersion::new).anyMatch(t -> target.compareTo(t) <= 0)));
+        semverMatchers.put(PredicateType.EQUAL_TO, ((target, objects) -> objects.stream().filter(Objects::nonNull)
+                .map(ComparableVersion::new).anyMatch(t -> target.compareTo(t) == 0)));
+        semverMatchers.put(PredicateType.NOT_EQUAL_TO, ((target, objects) -> objects.stream().filter(Objects::nonNull)
+                .map(ComparableVersion::new).noneMatch(t -> target.compareTo(t) == 0)));
+        semverMatchers.put(PredicateType.GREATER_THAN, ((target, objects) -> objects.stream().filter(Objects::nonNull)
+                .map(ComparableVersion::new).anyMatch(t -> target.compareTo(t) > 0)));
+        semverMatchers.put(PredicateType.GREATER_OR_EQUAL, ((target, objects) -> objects.stream()
+                .filter(Objects::nonNull).map(ComparableVersion::new).anyMatch(t -> target.compareTo(t) >= 0)));
+        semverMatchers.put(PredicateType.LESS_THAN, ((target, objects) -> objects.stream().filter(Objects::nonNull)
+                .map(ComparableVersion::new).anyMatch(t -> target.compareTo(t) < 0)));
+        semverMatchers.put(PredicateType.LESS_OR_EQUAL, ((target, objects) -> objects.stream().filter(Objects::nonNull)
+                .map(ComparableVersion::new).anyMatch(t -> target.compareTo(t) <= 0)));
 
     }
 
