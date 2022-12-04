@@ -26,9 +26,13 @@ final class FPContext {
 
     private static final String POST_EVENTS_DATA_API = "/api/events";
 
+    private static final String REALTIME_TOGGLE_UPDATE_API = "/realtime";
+
     private  URL synchronizerUrl;
 
     private  URL eventUrl;
+
+    private URL realtimeUrl;
 
     private final String serverSdkKey;
 
@@ -52,6 +56,11 @@ final class FPContext {
             } else {
                 this.eventUrl = config.eventUrl;
             }
+            if (Objects.isNull(config.realtimeUrl)) {
+                this.realtimeUrl = new URL(config.remoteUri.toString() + REALTIME_TOGGLE_UPDATE_API);
+            } else {
+                this.realtimeUrl = config.realtimeUrl;
+            }
         } catch (MalformedURLException e) {
             logger.error("construction context error", e);
         }
@@ -72,6 +81,10 @@ final class FPContext {
 
     public URL getEventUrl() {
         return eventUrl;
+    }
+
+    public URL getRealtimeUrl() {
+        return realtimeUrl;
     }
 
     public String getServerSdkKey() {

@@ -5,6 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.featureprobe.sdk.server.exceptions.HttpErrorException;
 import com.featureprobe.sdk.server.model.Repository;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import io.socket.client.IO;
+import io.socket.client.Socket;
+import io.socket.engineio.client.transports.WebSocket;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 import okhttp3.Headers;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -30,6 +37,7 @@ final class PollingSynchronizer implements Synchronizer {
     private final Duration refreshInterval;
     private final URL apiUrl;
     private volatile ScheduledFuture<?> worker;
+    private Socket socket;
     private final OkHttpClient httpClient;
     private final Headers headers;
 
@@ -55,6 +63,7 @@ final class PollingSynchronizer implements Synchronizer {
                 .retryOnConnectionFailure(false);
         headers = context.getHeaders();
         httpClient = builder.build();
+        connectSocket(context);
     }
 
     @Override
@@ -76,6 +85,10 @@ final class PollingSynchronizer implements Synchronizer {
             if (worker != null) {
                 worker.cancel(true);
                 worker = null;
+            }
+            if (socket != null) {
+                socket.close();
+                socket = null;
             }
         }
     }
@@ -101,5 +114,40 @@ final class PollingSynchronizer implements Synchronizer {
         } catch (Exception e) {
             logger.error("Unexpected error from polling processor", e);
         }
+    }
+
+    private void connectSocket(FPContext context) {
+        URI realtimeUri;
+        try {
+            realtimeUri = context.getRealtimeUrl().toURI();
+        } catch (URISyntaxException e) {
+            logger.error("invalid remote uri: {}, realtime toggle update is disabled",
+                context.getRealtimeUrl(), e);
+            return;
+        }
+
+        IO.Options sioOptions = IO.Options.builder()
+            .setTransports(new String[] {WebSocket.NAME})
+            .setPath(realtimeUri.getPath())
+            .build();
+        Socket sio = IO.socket(realtimeUri, sioOptions);
+
+        sio.on("connect", objects -> {
+            logger.info("connect socketio success");
+            Map<String, String> credential = new HashMap<>(1);
+            credential.put("key", context.getServerSdkKey());
+            sio.emit("register", credential);
+        });
+
+        sio.on("update", objects -> {
+            logger.info("socketio recv update event");
+            poll();
+        });
+
+        sio.on("disconnect", objects -> logger.info("socketio disconnected"));
+
+        sio.on("connect_error", objects -> logger.error("socketio error: {}", objects));
+
+        this.socket = sio.connect();
     }
 }

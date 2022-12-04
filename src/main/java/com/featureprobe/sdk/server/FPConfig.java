@@ -26,6 +26,8 @@ public final class FPConfig {
 
     URL eventUrl;
 
+    URL realtimeUrl;
+
     final String location;
 
     final SynchronizerFactory synchronizerFactory;
@@ -49,6 +51,7 @@ public final class FPConfig {
                 builder.httpConfiguration;
         this.synchronizerUrl = builder.synchronizerUrl;
         this.eventUrl = builder.eventUrl;
+        this.realtimeUrl = builder.realtimeUrl;
         this.startWait = builder.startWait == null ? DEFAULT_START_WAIT : builder.startWait;
     }
 
@@ -73,6 +76,8 @@ public final class FPConfig {
         private URL synchronizerUrl;
 
         private URL eventUrl;
+
+        private URL realtimeUrl;
 
         private Long startWait;
 
@@ -124,6 +129,11 @@ public final class FPConfig {
 
         public Builder eventUrl(URL eventUrl) {
             this.eventUrl = eventUrl;
+            return this;
+        }
+
+        public Builder realtimeUrl(URL realtimeUrl) {
+            this.realtimeUrl = realtimeUrl;
             return this;
         }
 
