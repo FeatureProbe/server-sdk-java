@@ -57,7 +57,7 @@ jobs:
 
       - name: Commit documentation # 提交文档到Git仓库
         env:
-          GIT_URL: "git@github.com:<USERNAME>/<PROJECT>.git" # 项目的地址，注意要用SSH格式的。
+          GIT_URL: "git@github.com:${{ github.repository }}.git" # 项目的地址，注意要用SSH格式的。
         run: |
           cd docs
           git init
