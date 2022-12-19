@@ -3,20 +3,20 @@ name: Javadoc
 on:
   # 支持手动触发构建
   workflow_dispatch:
-    release:
-      # 创建release的时候触发
-      types: [ published ]
-        #  push: # 可选，在推送主分支时触发
-        #    branches:
-        #    - main
-        #    - master
+  release:
+    # 创建release的时候触发
+    types: [ published ]
+#  push: # 可选，在推送主分支时触发
+#    branches:
+#    - main
+#    - master
 
-      jobs:
-        apidoc-deploy:
-          runs-on: ubuntu-latest
-      steps:
-        - name: Checkout the repo
-          uses: actions/checkout@v2
+jobs:
+  apidoc-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v2
 
       - name: Set up the Java JDK
         uses: actions/setup-java@v2
