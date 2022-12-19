@@ -51,8 +51,8 @@ jobs:
           echo "$DEPLOY_PRI" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan github.com >> ~/.ssh/known_hosts
-          git config --global user.name '$DEPLOY_PRI'
-          git config --global user.email '$DEPLOY_PRI'
+          git config --global user.name 'FeatureProbeReleaseBot'
+          git config --global user.email 'bot@featureprobe.io'
 
 
       - name: Commit documentation # 提交文档到Git仓库
