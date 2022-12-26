@@ -1,0 +1,72 @@
+name: Javadoc
+
+on:
+  # 支持手动触发构建
+  workflow_dispatch:
+  release:
+    # 创建release的时候触发
+    types: [ published ]
+#  push: # 可选，在推送主分支时触发
+#    branches:
+#    - main
+#    - master
+
+jobs:
+  apidoc-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v2
+
+      - name: Set up the Java JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+
+      - name: Generate docs #生成Javadoc
+        run: mvn javadoc:javadoc
+
+      - name: Copy to Location # 复制Javadoc到一个新文件夹，便于进行git操作
+        run: |
+          rm -rf docs
+          mkdir -vp docs
+          cp -vrf target/site/apidocs/* docs/
+
+      - name: Generate the sitemap # 可选，生成sitemap
+        id: sitemap
+        uses: cicirello/generate-sitemap@v1
+        with:
+          base-url-path: https://carmjos.github.io/userprefix
+          path-to-root: docs
+
+      - name: Configure Git # 配置Git
+        env:
+          DEPLOY_PRI: ${{secrets.DEPLOY_PRI}} # 这里就是刚刚配置的私钥了
+          GIT_USERNAME: ${{ github.repository_owner }} #Github用户名，这里用了Actions自带的变量，也可以写死。
+          GIT_EMAIL: ${{ github.repository_owner }}@user.github.com # 邮箱,可以写自己的邮箱。
+        run: |
+          sudo timedatectl set-timezone "Asia/Shanghai"
+          mkdir -p ~/.ssh/
+          echo "$DEPLOY_PRI" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+          git config --global user.name 'FeatureProbeReleaseBot'
+          git config --global user.email 'bot@featureprobe.io'
+
+
+      - name: Commit documentation # 提交文档到Git仓库
+        env:
+          GIT_URL: "git@github.com:${{ github.repository }}.git" # 项目的地址，注意要用SSH格式的。
+        run: |
+          cd docs
+          git init
+          git remote add origin $GIT_URL
+          git checkout -b gh-pages
+          git add -A
+          git commit -m "API Document generated."
+
+      - name: Push javadocs # 推送
+        run: |
+          cd docs
+          git push origin HEAD:gh-pages --force
