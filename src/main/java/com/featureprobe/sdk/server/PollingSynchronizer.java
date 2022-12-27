@@ -8,8 +8,6 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.engineio.client.transports.WebSocket;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import okhttp3.Headers;
@@ -102,8 +100,8 @@ final class PollingSynchronizer implements Synchronizer {
         try (Response response = httpClient.newCall(request).execute()) {
             String body = response.body().string();
             if (!response.isSuccessful()) {
-                throw new HttpErrorException(String.format("Http request error: code: {}, body: {}:" + response.code(),
-                        response.body()));
+                throw new HttpErrorException(String.format("Http request error: code: %d, body: %s",
+                        response.code(), response.body().toString()));
             }
             logger.debug("Http response: {}", response);
             logger.debug("Http response body: {}", body);
@@ -117,26 +115,17 @@ final class PollingSynchronizer implements Synchronizer {
     }
 
     private void connectSocket(FPContext context) {
-        URI realtimeUri;
-        try {
-            realtimeUri = context.getRealtimeUrl().toURI();
-        } catch (URISyntaxException e) {
-            logger.error("invalid remote uri: {}, realtime toggle update is disabled",
-                context.getRealtimeUrl(), e);
-            return;
-        }
-
         IO.Options sioOptions = IO.Options.builder()
             .setTransports(new String[] {WebSocket.NAME})
-            .setPath(realtimeUri.getPath())
+            .setPath(context.getRealtimeUri().getPath())
             .build();
-        Socket sio = IO.socket(realtimeUri, sioOptions);
+        Socket sio = IO.socket(context.getRealtimeUri(), sioOptions);
 
         sio.on("connect", objects -> {
             logger.info("connect socketio success");
-            Map<String, String> credential = new HashMap<>(1);
-            credential.put("key", context.getServerSdkKey());
-            sio.emit("register", credential);
+            Map<String, String> credentials = new HashMap<>(1);
+            credentials.put("key", context.getServerSdkKey());
+            sio.emit("register", credentials);
         });
 
         sio.on("update", objects -> {

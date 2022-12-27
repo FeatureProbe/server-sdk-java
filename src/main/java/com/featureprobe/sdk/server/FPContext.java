@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.time.Duration;
 import java.util.Objects;
@@ -32,7 +33,7 @@ final class FPContext {
 
     private  URL eventUrl;
 
-    private URL realtimeUrl;
+    private URI realtimeUri;
 
     private final String serverSdkKey;
 
@@ -56,10 +57,10 @@ final class FPContext {
             } else {
                 this.eventUrl = config.eventUrl;
             }
-            if (Objects.isNull(config.realtimeUrl)) {
-                this.realtimeUrl = new URL(config.remoteUri.toString() + REALTIME_TOGGLE_UPDATE_API);
+            if (Objects.isNull(config.realtimeUri)) {
+                this.realtimeUri = URI.create(config.remoteUri.toString() + REALTIME_TOGGLE_UPDATE_API);
             } else {
-                this.realtimeUrl = config.realtimeUrl;
+                this.realtimeUri = config.realtimeUri;
             }
         } catch (MalformedURLException e) {
             logger.error("construction context error", e);
@@ -83,8 +84,8 @@ final class FPContext {
         return eventUrl;
     }
 
-    public URL getRealtimeUrl() {
-        return realtimeUrl;
+    public URI getRealtimeUri() {
+        return realtimeUri;
     }
 
     public String getServerSdkKey() {
