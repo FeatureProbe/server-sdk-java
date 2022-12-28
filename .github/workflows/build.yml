@@ -20,7 +20,7 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Build with Maven
-      run: | 
+      run: |
         mvn -B package --file pom.xml
         mvn failsafe:integration-test
 
