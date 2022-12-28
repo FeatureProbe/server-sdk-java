@@ -4,12 +4,11 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.featureprobe.sdk.server.exceptions.HttpErrorException;
 import com.featureprobe.sdk.server.model.Repository;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.engineio.client.transports.WebSocket;
-import java.util.HashMap;
-import java.util.Map;
 import okhttp3.Headers;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -19,6 +18,8 @@ import org.slf4j.Logger;
 import java.io.IOException;
 import java.net.URL;
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -29,13 +30,15 @@ import java.util.concurrent.TimeUnit;
 final class PollingSynchronizer implements Synchronizer {
 
     private static final Logger logger = Loggers.SYNCHRONIZER;
-    private static final String GET_SDK_KEY_HEADER = "Authorization";
-    final ObjectMapper mapper = new ObjectMapper();
-    DataRepository dataRepository;
+    private final ObjectMapper mapper = new ObjectMapper();
+    private final DataRepository dataRepository;
     private final Duration refreshInterval;
     private final URL apiUrl;
     private volatile ScheduledFuture<?> worker;
-    private Socket socket;
+
+    @VisibleForTesting
+    Socket socket;
+
     private final OkHttpClient httpClient;
     private final Headers headers;
 
@@ -53,15 +56,15 @@ final class PollingSynchronizer implements Synchronizer {
         this.apiUrl = context.getSynchronizerUrl();
         this.dataRepository = dataRepository;
         this.initFuture = new CompletableFuture<>();
-        OkHttpClient.Builder builder = new OkHttpClient.Builder()
+        this.headers = context.getHeaders();
+        this.httpClient = new OkHttpClient.Builder()
                 .connectionPool(context.getHttpConfiguration().connectionPool)
                 .connectTimeout(context.getHttpConfiguration().connectTimeout)
                 .readTimeout(context.getHttpConfiguration().readTimeout)
                 .writeTimeout(context.getHttpConfiguration().writeTimeout)
-                .retryOnConnectionFailure(false);
-        headers = context.getHeaders();
-        httpClient = builder.build();
-        connectSocket(context);
+                .retryOnConnectionFailure(false)
+                .build();
+        this.socket = connectSocket(context);
     }
 
     @Override
@@ -114,11 +117,11 @@ final class PollingSynchronizer implements Synchronizer {
         }
     }
 
-    private void connectSocket(FPContext context) {
+    private Socket connectSocket(FPContext context) {
         IO.Options sioOptions = IO.Options.builder()
-            .setTransports(new String[] {WebSocket.NAME})
-            .setPath(context.getRealtimeUri().getPath())
-            .build();
+                .setTransports(new String[]{WebSocket.NAME})
+                .setPath(context.getRealtimeUri().getPath())
+                .build();
         Socket sio = IO.socket(context.getRealtimeUri(), sioOptions);
 
         sio.on("connect", objects -> {
@@ -137,6 +140,6 @@ final class PollingSynchronizer implements Synchronizer {
 
         sio.on("connect_error", objects -> logger.error("socketio error: {}", objects));
 
-        this.socket = sio.connect();
+        return sio.connect();
     }
 }

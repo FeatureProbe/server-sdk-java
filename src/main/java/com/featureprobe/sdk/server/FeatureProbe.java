@@ -34,6 +34,7 @@ public final class FeatureProbe {
     @VisibleForTesting
     final DataRepository dataRepository;
 
+    @VisibleForTesting
     Synchronizer synchronizer;
 
     @VisibleForTesting
