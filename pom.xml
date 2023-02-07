@@ -6,7 +6,7 @@
 
     <groupId>com.featureprobe</groupId>
     <artifactId>server-sdk-java</artifactId>
-    <version>1.4.0</version>
+    <version>1.4.1-SNAPSHOT</version>
     <name>server-sdk-java</name>
     <url>https://github.com/FeatureProbe/server-sdk-java</url>
     <description>FeatureProbe Server Side SDK for Java</description>
