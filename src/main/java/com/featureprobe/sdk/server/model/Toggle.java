@@ -14,6 +14,10 @@ public final class Toggle {
 
     private Boolean enabled;
 
+    private Boolean trackAccessEvents;
+
+    private Long lastModified;
+
     private Long version;
 
     private Serve disabledServe;
@@ -138,6 +142,22 @@ public final class Toggle {
 
     public void setForClient(Boolean forClient) {
         this.forClient = forClient;
+    }
+
+    public void setTrackAccessEvents(Boolean trackAccessEvents) {
+        this.trackAccessEvents = trackAccessEvents;
+    }
+
+    public Boolean getTrackAccessEvents() {
+        return trackAccessEvents;
+    }
+
+    public void setLastModified(Long lastModified) {
+        this.lastModified = lastModified;
+    }
+
+    public Long getLastModified() {
+        return lastModified;
     }
 
 }
