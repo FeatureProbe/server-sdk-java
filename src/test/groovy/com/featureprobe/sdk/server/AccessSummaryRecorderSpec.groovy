@@ -2,15 +2,15 @@ package com.featureprobe.sdk.server
 
 import spock.lang.Specification
 
-class AccessRecorderSpec extends Specification {
+class AccessSummaryRecorderSpec extends Specification {
 
-    def AccessRecorder accessRecorder
+    def AccessSummaryRecorder accessRecorder
     def Event event
 
     def setup() {
-        accessRecorder = new AccessRecorder()
+        accessRecorder = new AccessSummaryRecorder()
         FPUser user = new FPUser().stableRollout("test_user")
-        event = new AccessEvent(System.currentTimeMillis(), user, "test_toggle", "true", 1, 0)
+        event = new AccessEvent(user.key, "test_toggle", "true", 1, 0, 1, "hid default rule.", true)
     }
 
     def "add a Event"() {

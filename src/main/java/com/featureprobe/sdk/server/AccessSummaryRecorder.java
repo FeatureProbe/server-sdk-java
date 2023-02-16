@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AccessRecorder {
+public class AccessSummaryRecorder {
 
     Map<String, List<Counter>> counters;
 
@@ -13,13 +13,13 @@ public class AccessRecorder {
 
     long endTime;
 
-    AccessRecorder() {
+    AccessSummaryRecorder() {
         counters = new HashMap<>();
     }
 
-    private AccessRecorder(AccessRecorder accessRecorder) {
-        counters = new HashMap<>(accessRecorder.counters);
-        startTime = accessRecorder.startTime;
+    private AccessSummaryRecorder(AccessSummaryRecorder accessSummaryRecorder) {
+        counters = new HashMap<>(accessSummaryRecorder.counters);
+        startTime = accessSummaryRecorder.startTime;
         endTime = System.currentTimeMillis();
     }
 
@@ -27,13 +27,13 @@ public class AccessRecorder {
 
         long count;
 
-        final String value;
+        final Object value;
 
         final Long version;
 
         final Integer index;
 
-        public Counter(String value, Long version, Integer index) {
+        public Counter(Object value, Long version, Integer index) {
             this.value = value;
             this.version = version;
             this.index = index;
@@ -44,15 +44,15 @@ public class AccessRecorder {
             ++count;
         }
 
-        public boolean isGroup(String value, Long version, Integer index) {
-            return this.value.equals(value) && this.version.equals(version) && this.index.equals(index);
+        public boolean isGroup(Long version, Integer index) {
+            return  this.version.equals(version) && this.index.equals(index);
         }
 
         public long getCount() {
             return count;
         }
 
-        public String getValue() {
+        public Object getValue() {
             return value;
         }
 
@@ -73,15 +73,15 @@ public class AccessRecorder {
         if (counters.containsKey(accessEvent.getKey())) {
             List<Counter> counters = this.counters.get(accessEvent.getKey());
             for (Counter counter : counters) {
-                if (counter.isGroup(accessEvent.getValue(), accessEvent.getVersion(), accessEvent.getIndex())) {
+                if (counter.isGroup(accessEvent.getVersion(), accessEvent.getVariationIndex())) {
                     counter.increment();
                     return;
                 }
             }
-            counters.add(new Counter(accessEvent.getValue(), accessEvent.getVersion(), accessEvent.getIndex()));
+            counters.add(new Counter(accessEvent.getValue(), accessEvent.getVersion(), accessEvent.getVariationIndex()));
         } else {
             List<Counter> groups = new ArrayList<>(1);
-            groups.add(new Counter(accessEvent.getValue(), accessEvent.getVersion(), accessEvent.getIndex()));
+            groups.add(new Counter(accessEvent.getValue(), accessEvent.getVersion(), accessEvent.getVariationIndex()));
             counters.put(accessEvent.getKey(), groups);
         }
     }
@@ -90,8 +90,8 @@ public class AccessRecorder {
         counters = new HashMap<>();
     }
 
-    public AccessRecorder snapshot() {
-        return new AccessRecorder(this);
+    public AccessSummaryRecorder snapshot() {
+        return new AccessSummaryRecorder(this);
     }
 
     public Map<String, List<Counter>> getCounters() {
