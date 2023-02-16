@@ -5,6 +5,7 @@ import com.featureprobe.sdk.server.FPDetail;
 import com.featureprobe.sdk.server.FPUser;
 import com.featureprobe.sdk.server.FeatureProbe;
 import java.io.IOException;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import com.featureprobe.sdk.server.Loggers;
@@ -23,7 +24,7 @@ public class FeatureProbeDemo {
     // Server Side SDK Key for your project and environment
     public static final String FEATURE_PROBE_SERVER_SDK_KEY = "server-8ed48815ef044428826787e9a238b9c6a479f98c";
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
 
         Logger root = (Logger)LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
         root.setLevel(Level.WARN);
@@ -54,6 +55,28 @@ public class FeatureProbeDemo {
         FPDetail<Boolean> isOpenDetail = fpClient.boolDetail(YOUR_TOGGLE_KEY, user, false);
         System.out.println("detail:" + isOpenDetail.getReason());
         System.out.println("rule index:" + isOpenDetail.getRuleIndex());
+
+
+        // Simulate conversion rate of 1000 users for a new feature
+        final String YOUR_CUSTOM_EVENT_NAME = "new_feature_conversion";
+        for (int i = 0; i < 1000; i++) {
+            FPUser eventUser = new FPUser().stableRollout(String.valueOf(System.nanoTime()));
+            boolean newFeature = fpClient.boolValue(YOUR_TOGGLE_KEY, eventUser, false);
+            Random random = new Random();
+            int randomRang = random.nextInt(100);
+            if (newFeature) {
+                if (randomRang <= 55) {
+                    System.out.println("New feature conversion.");
+                    fpClient.track(YOUR_CUSTOM_EVENT_NAME, eventUser);
+                }
+            } else {
+                if (randomRang > 55) {
+                    System.out.println("Old feature conversion.");
+                    fpClient.track(YOUR_CUSTOM_EVENT_NAME, eventUser);
+                }
+            }
+            Thread.sleep(200);
+        }
 
         fpClient.close();
 

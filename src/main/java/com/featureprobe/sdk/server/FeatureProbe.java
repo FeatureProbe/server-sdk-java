@@ -7,6 +7,7 @@ import com.featureprobe.sdk.server.model.Toggle;
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
+
 import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
@@ -49,6 +50,7 @@ public final class FeatureProbe {
 
     /**
      * Creates a new client instance that connects to FeatureProbe with the default configuration.
+     *
      * @param serverSDKKey for your FeatureProbe environment
      */
     public FeatureProbe(String serverSDKKey) {
@@ -57,8 +59,9 @@ public final class FeatureProbe {
 
     /**
      * Creates a new client to connect to FeatureProbe with a custom configuration.
+     *
      * @param serverSDKKey for your FeatureProbe environment
-     * @param config the configuration control FeatureProbe client behavior
+     * @param config       the configuration control FeatureProbe client behavior
      */
     public FeatureProbe(String serverSDKKey, FPConfig config) {
         if (StringUtils.isBlank(serverSDKKey)) {
@@ -83,8 +86,9 @@ public final class FeatureProbe {
 
     /**
      * Get the evaluated value of a boolean toggle
+     *
      * @param toggleKey
-     * @param user {@link FPUser}
+     * @param user         {@link FPUser}
      * @param defaultValue
      * @return
      */
@@ -94,8 +98,9 @@ public final class FeatureProbe {
 
     /**
      * Get the evaluated value of a string toggle
+     *
      * @param toggleKey
-     * @param user {@link FPUser}
+     * @param user         {@link FPUser}
      * @param defaultValue
      * @return
      */
@@ -105,8 +110,9 @@ public final class FeatureProbe {
 
     /**
      * Get the evaluated value of a number toggle
+     *
      * @param toggleKey
-     * @param user {@link FPUser}
+     * @param user         {@link FPUser}
      * @param defaultValue
      * @return
      */
@@ -116,8 +122,9 @@ public final class FeatureProbe {
 
     /**
      * Get the evaluated value of a json toggle
+     *
      * @param toggleKey
-     * @param user {@link FPUser}
+     * @param user         {@link FPUser}
      * @param defaultValue
      * @param clazz
      * @param <T>
@@ -129,8 +136,9 @@ public final class FeatureProbe {
 
     /**
      * Get detailed evaluation results of boolean toggle
+     *
      * @param toggleKey
-     * @param user {@link FPUser}
+     * @param user         {@link FPUser}
      * @param defaultValue
      * @return
      */
@@ -140,8 +148,9 @@ public final class FeatureProbe {
 
     /**
      * Get detailed evaluation results of string toggle
+     *
      * @param toggleKey
-     * @param user {@link FPUser}
+     * @param user         {@link FPUser}
      * @param defaultValue
      * @return
      */
@@ -151,8 +160,9 @@ public final class FeatureProbe {
 
     /**
      * Get detailed evaluation results of number toggle
+     *
      * @param toggleKey
-     * @param user {@link FPUser}
+     * @param user         {@link FPUser}
      * @param defaultValue
      * @return
      */
@@ -162,8 +172,9 @@ public final class FeatureProbe {
 
     /**
      * Get detailed evaluation results of json toggle
+     *
      * @param toggleKey
-     * @param user {@link FPUser}
+     * @param user         {@link FPUser}
      * @param defaultValue
      * @param clazz
      * @param <T>
@@ -172,6 +183,7 @@ public final class FeatureProbe {
     public <T> FPDetail<T> jsonDetail(String toggleKey, FPUser user, T defaultValue, Class<T> clazz) {
         return jsonEvaluateDetail(toggleKey, user, defaultValue, clazz);
     }
+
 
     /**
      * Manually events push
@@ -183,6 +195,7 @@ public final class FeatureProbe {
 
     /**
      * Safely shut down FeatureProbe instance
+     *
      * @throws IOException
      */
     public void close() throws IOException {
@@ -194,10 +207,32 @@ public final class FeatureProbe {
 
     /**
      * Get FeatureProbe instance initial state
+     *
      * @return
      */
     public boolean initialized() {
         return dataRepository.initialized();
+    }
+
+    /**
+     * Tracks that a custom defined event
+     *
+     * @param eventName the name of the event
+     * @param user      {@link FPUser}
+     */
+    public void track(String eventName, FPUser user) {
+        eventProcessor.push(new CustomEvent(eventName, user.getKey(), null));
+    }
+
+    /**
+     * Tracks that a custom defined event, and provides an additional numeric value for custom event.
+     *
+     * @param eventName the name of the event
+     * @param user      {@link FPUser}
+     * @param value     a numeric value
+     */
+    public void track(String eventName, FPUser user, double value) {
+        eventProcessor.push(new CustomEvent(eventName, user.getKey(), value));
     }
 
     private <T> T jsonEvaluate(String toggleKey, FPUser user, T defaultValue, Class<T> clazz) {
@@ -207,10 +242,7 @@ public final class FeatureProbe {
             if (Objects.nonNull(toggle)) {
                 EvaluationResult evalResult = toggle.eval(user, segments, defaultValue);
                 String value = mapper.writeValueAsString(evalResult.getValue());
-                AccessEvent accessEvent = new AccessEvent(System.currentTimeMillis(), user,
-                        toggleKey, String.valueOf(evalResult.getValue()), evalResult.getVersion(),
-                        evalResult.getVariationIndex().get());
-                eventProcessor.push(accessEvent);
+                eventProcessor.push(buildAccessEvent(toggle, evalResult, user));
                 return mapper.readValue(value, clazz);
             }
         } catch (JsonProcessingException e) {
@@ -227,10 +259,7 @@ public final class FeatureProbe {
             Map<String, Segment> segments = dataRepository.getAllSegment();
             if (Objects.nonNull(toggle)) {
                 EvaluationResult evalResult = toggle.eval(user, segments, defaultValue);
-                AccessEvent accessEvent = new AccessEvent(System.currentTimeMillis(), user,
-                        toggleKey, String.valueOf(evalResult.getValue()), evalResult.getVersion(),
-                        evalResult.getVariationIndex().get());
-                eventProcessor.push(accessEvent);
+                eventProcessor.push(buildAccessEvent(toggle, evalResult, user));
                 return clazz.cast(evalResult.getValue());
             }
         } catch (ClassCastException e) {
@@ -289,10 +318,7 @@ public final class FeatureProbe {
                 detail.setReason(evalResult.getReason());
                 detail.setRuleIndex(evalResult.getRuleIndex());
                 detail.setVersion(Optional.of(evalResult.getVersion()));
-                AccessEvent accessEvent = new AccessEvent(System.currentTimeMillis(), user,
-                        toggleKey, String.valueOf(evalResult.getValue()), evalResult.getVersion(),
-                        evalResult.getVariationIndex().get());
-                eventProcessor.push(accessEvent);
+                eventProcessor.push(buildAccessEvent(toggle, evalResult, user));
             } else {
                 detail.setReason("Toggle not exist");
                 detail.setValue(defaultValue);
@@ -302,6 +328,14 @@ public final class FeatureProbe {
             detail.setValue(defaultValue);
         }
         return detail;
+    }
+
+    private Event buildAccessEvent(Toggle toggle, EvaluationResult evalResult, FPUser user) {
+        boolean trackAccessEvents = Objects.isNull(toggle.getTrackAccessEvents()) ?
+                false : toggle.getTrackAccessEvents().booleanValue();
+        return new AccessEvent(user.getKey(), toggle.getKey(), evalResult.getValue(),
+                evalResult.getVersion(), evalResult.getVariationIndex().orElse(null),
+                evalResult.getRuleIndex().orElse(null), evalResult.getReason(), trackAccessEvents);
     }
 
 }

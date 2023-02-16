@@ -212,14 +212,14 @@ public class DefaultEventProcessor implements EventProcessor {
 
         List<Event> events = new ArrayList<>();
 
-        AccessRecorder access = new AccessRecorder();
+        AccessSummaryRecorder access = new AccessSummaryRecorder();
 
         public EventRepository() {
         }
 
-        private EventRepository(EventRepository eventRepository) {
-            this.events = eventRepository.events;
-            this.access = eventRepository.access.snapshot();
+        private EventRepository(EventRepository repository) {
+            this.events = new ArrayList<>(repository.events);
+            this.access = repository.access.snapshot();
         }
 
         boolean isEmpty() {
@@ -229,6 +229,12 @@ public class DefaultEventProcessor implements EventProcessor {
         void add(Event event) {
             if (event instanceof AccessEvent) {
                 access.add(event);
+//                if (((AccessEvent) event).isTrackAccessEvents()) {
+                if (true) {
+                    events.add(event);
+                }
+            } else if (event instanceof CustomEvent) {
+                events.add(event);
             }
         }
 
@@ -245,7 +251,7 @@ public class DefaultEventProcessor implements EventProcessor {
             return events;
         }
 
-        public AccessRecorder getAccess() {
+        public AccessSummaryRecorder getAccess() {
             return access;
         }
     }

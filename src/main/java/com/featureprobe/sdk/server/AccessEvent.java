@@ -1,28 +1,41 @@
 package com.featureprobe.sdk.server;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class AccessEvent extends Event {
 
     private final String key;
-
-    private final String value;
+    private final Object value;
 
     private final Long version;
 
-    private final Integer index;
+    private final Integer variationIndex;
 
-    public AccessEvent(long timestamp, FPUser user, String key, String value, Long version, Integer index) {
-        super(timestamp, user);
-        this.key = key;
+    private final Integer ruleIndex;
+
+    private final String reason;
+
+    @JsonIgnore
+    private boolean trackAccessEvents;
+
+    public AccessEvent(String user, String key, Object value, Long version, Integer variationIndex,
+                       Integer ruleIndex, String reason, boolean trackAccessEvents) {
+        super("access", System.currentTimeMillis(), user);
         this.value = value;
         this.version = version;
-        this.index = index;
+        this.variationIndex = variationIndex;
+        this.key = key;
+        this.ruleIndex = ruleIndex;
+        this.reason = reason;
+        this.trackAccessEvents = trackAccessEvents;
     }
+
 
     public String getKey() {
         return key;
     }
 
-    public String getValue() {
+    public Object getValue() {
         return value;
     }
 
@@ -30,7 +43,19 @@ public class AccessEvent extends Event {
         return version;
     }
 
-    public Integer getIndex() {
-        return index;
+    public Integer getVariationIndex() {
+        return variationIndex;
+    }
+
+    public Integer getRuleIndex() {
+        return ruleIndex;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public boolean isTrackAccessEvents() {
+        return trackAccessEvents;
     }
 }
