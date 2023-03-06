@@ -22,6 +22,8 @@ import org.slf4j.Logger;
 
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.Duration;
 import java.util.Objects;
@@ -43,7 +45,11 @@ final class FPContext {
 
     private static final String POST_EVENTS_DATA_API = "/api/events";
 
+    private static final String REALTIME_URI_PATH = "/realtime";
+
     private URL synchronizerUrl;
+
+    private URI realtimeUri;
 
     private URL eventUrl;
 
@@ -69,7 +75,14 @@ final class FPContext {
             } else {
                 this.eventUrl = config.eventUrl;
             }
+            if (Objects.isNull(config.realtimeUri)) {
+                this.realtimeUri = new URI(config.remoteUri.toString() + REALTIME_URI_PATH);
+            } else {
+                this.realtimeUri = config.realtimeUri;
+            }
         } catch (MalformedURLException e) {
+            logger.error("construction context error", e);
+        } catch (URISyntaxException e) {
             logger.error("construction context error", e);
         }
         this.serverSdkKey = serverSdkKey;
@@ -119,7 +132,7 @@ final class FPContext {
                     .getResourceAsStream("/META-INF/maven/com.featureprobe/server-sdk-java/pom.properties");
             if (is != null) {
                 p.load(is);
-                version = p.getProperty("version", "");
+                version = p.getProperty("version", DEFAULT_SDK_VERSION);
             }
         } catch (Exception e) {
 
@@ -134,8 +147,12 @@ final class FPContext {
             }
         }
         if (version == null) {
-            version = "";
+            version = DEFAULT_SDK_VERSION;
         }
         return version;
+    }
+
+    public URI getRealtimeUri() {
+        return realtimeUri;
     }
 }
