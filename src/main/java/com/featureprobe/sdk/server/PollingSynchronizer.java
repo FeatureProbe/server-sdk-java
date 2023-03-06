@@ -97,7 +97,7 @@ final class PollingSynchronizer implements Synchronizer {
         }
     }
 
-    private void poll() {
+    public void poll() {
         Request request = new Request.Builder()
                 .url(apiUrl.toString())
                 .headers(headers)

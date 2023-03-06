@@ -28,6 +28,8 @@ public final class FPConfig {
 
     static final Duration DEFAULT_INTERVAL = Duration.ofSeconds(5);
 
+    static final Duration DEFAULT_REALTIME_INTERVAL = Duration.ofSeconds(10);
+
     static final Long DEFAULT_START_WAIT = TimeUnit.SECONDS.toNanos(5);
 
     protected static final FPConfig DEFAULT = new Builder().build();
@@ -41,6 +43,8 @@ public final class FPConfig {
     URL synchronizerUrl;
 
     URL eventUrl;
+
+    URI realtimeUri;
 
     final String location;
 
@@ -57,7 +61,7 @@ public final class FPConfig {
         this.remoteUri = builder.remoteUri;
         this.location = builder.location;
         this.synchronizerFactory =
-                builder.synchronizer == null ? new PollingSynchronizerFactory() : builder.synchronizer;
+                builder.synchronizer == null ? new StreamingSynchronizerFactory() : builder.synchronizer;
         this.dataRepositoryFactory =
                 builder.dataRepository == null ? new MemoryDataRepositoryFactory() : builder.dataRepository;
         this.eventProcessorFactory = new DefaultEventProcessorFactory();
@@ -65,6 +69,7 @@ public final class FPConfig {
                 builder.httpConfiguration == null ? HttpConfiguration.DEFAULT : builder.httpConfiguration;
         this.synchronizerUrl = builder.synchronizerUrl;
         this.eventUrl = builder.eventUrl;
+        this.realtimeUri = builder.realtimeUri;
         this.startWait = builder.startWait == null ? DEFAULT_START_WAIT : builder.startWait;
     }
 
@@ -90,6 +95,8 @@ public final class FPConfig {
 
         private URL eventUrl;
 
+        private URI realtimeUri;
+
         private Long startWait;
 
         public Builder() {
@@ -102,6 +109,18 @@ public final class FPConfig {
 
         public Builder pollingMode() {
             this.synchronizer = new PollingSynchronizerFactory();
+            return this;
+        }
+
+        public Builder streamingMode() {
+            this.refreshInterval = DEFAULT_REALTIME_INTERVAL;
+            this.synchronizer = new StreamingSynchronizerFactory();
+            return this;
+        }
+
+        public Builder streamingMode(Duration refreshInterval) {
+            this.refreshInterval = refreshInterval;
+            this.synchronizer = new StreamingSynchronizerFactory();
             return this;
         }
 
@@ -140,6 +159,16 @@ public final class FPConfig {
 
         public Builder eventUrl(URL eventUrl) {
             this.eventUrl = eventUrl;
+            return this;
+        }
+
+        public Builder realtimeUri(URI realtimeUri) {
+            this.realtimeUri = realtimeUri;
+            return this;
+        }
+
+        public Builder realtimeUri(String realtimeUri) {
+            this.realtimeUri = URI.create(realtimeUri);
             return this;
         }
 

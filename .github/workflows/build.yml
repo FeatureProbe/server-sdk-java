@@ -24,7 +24,9 @@ jobs:
       run: mvn spotless:check
 
     - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      run: |
+        mvn -B package --file pom.xml
+        mvn failsafe:integration-test
 
     - name: Upload coverage reports to Codecov with GitHub Action
       uses: codecov/codecov-action@v2
