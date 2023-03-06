@@ -62,7 +62,7 @@ public class AccessSummaryRecorder {
         }
 
         public boolean isGroup(Long version, Integer index) {
-            return  this.version.equals(version) && this.index.equals(index);
+            return this.version.equals(version) && this.index.equals(index);
         }
 
         public long getCount() {
@@ -95,7 +95,8 @@ public class AccessSummaryRecorder {
                     return;
                 }
             }
-            counters.add(new Counter(accessEvent.getValue(), accessEvent.getVersion(), accessEvent.getVariationIndex()));
+            counters.add(
+                    new Counter(accessEvent.getValue(), accessEvent.getVersion(), accessEvent.getVariationIndex()));
         } else {
             List<Counter> groups = new ArrayList<>(1);
             groups.add(new Counter(accessEvent.getValue(), accessEvent.getVersion(), accessEvent.getVariationIndex()));

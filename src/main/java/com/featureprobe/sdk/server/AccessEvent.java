@@ -47,7 +47,6 @@ public class AccessEvent extends Event {
         this.trackAccessEvents = trackAccessEvents;
     }
 
-
     public String getKey() {
         return key;
     }

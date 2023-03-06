@@ -201,7 +201,6 @@ public final class FeatureProbe {
         return jsonEvaluateDetail(toggleKey, user, defaultValue, clazz);
     }
 
-
     /**
      * Manually events push
      */
@@ -347,8 +346,8 @@ public final class FeatureProbe {
     }
 
     private Event buildAccessEvent(Toggle toggle, EvaluationResult evalResult, FPUser user) {
-        boolean trackAccessEvents = Objects.isNull(toggle.getTrackAccessEvents()) ?
-                false : toggle.getTrackAccessEvents().booleanValue();
+        boolean trackAccessEvents =
+                Objects.isNull(toggle.getTrackAccessEvents()) ? false : toggle.getTrackAccessEvents().booleanValue();
         return new AccessEvent(user.getKey(), toggle.getKey(), evalResult.getValue(),
                 evalResult.getVersion(), evalResult.getVariationIndex().orElse(null),
                 evalResult.getRuleIndex().orElse(null), evalResult.getReason(), trackAccessEvents);

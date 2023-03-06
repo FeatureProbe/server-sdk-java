@@ -72,7 +72,6 @@ public class FeatureProbeDemo {
         System.out.println("detail:" + isOpenDetail.getReason());
         System.out.println("rule index:" + isOpenDetail.getRuleIndex());
 
-
         // Simulate conversion rate of 1000 users for a new feature
         final String YOUR_CUSTOM_EVENT_NAME = "new_feature_conversion";
         for (int i = 0; i < 1000; i++) {

@@ -245,8 +245,7 @@ public class DefaultEventProcessor implements EventProcessor {
         void add(Event event) {
             if (event instanceof AccessEvent) {
                 access.add(event);
-//                if (((AccessEvent) event).isTrackAccessEvents()) {
-                if (true) {
+                if (((AccessEvent) event).isTrackAccessEvents()) {
                     events.add(event);
                 }
             } else if (event instanceof CustomEvent) {
