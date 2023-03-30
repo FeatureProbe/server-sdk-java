@@ -255,8 +255,9 @@ public final class FeatureProbe {
         try {
             Toggle toggle = dataRepository.getToggle(toggleKey);
             Map<String, Segment> segments = dataRepository.getAllSegment();
+            Map<String, Toggle> toggles = dataRepository.getAllToggle();
             if (Objects.nonNull(toggle)) {
-                EvaluationResult evalResult = toggle.eval(user, segments, defaultValue);
+                EvaluationResult evalResult = toggle.eval(user, toggles, segments, defaultValue, 1);
                 String value = mapper.writeValueAsString(evalResult.getValue());
                 eventProcessor.push(buildAccessEvent(toggle, evalResult, user));
                 return mapper.readValue(value, clazz);
@@ -273,8 +274,9 @@ public final class FeatureProbe {
         try {
             Toggle toggle = dataRepository.getToggle(toggleKey);
             Map<String, Segment> segments = dataRepository.getAllSegment();
+            Map<String, Toggle> toggles = dataRepository.getAllToggle();
             if (Objects.nonNull(toggle)) {
-                EvaluationResult evalResult = toggle.eval(user, segments, defaultValue);
+                EvaluationResult evalResult = toggle.eval(user, toggles, segments, defaultValue, 1);
                 eventProcessor.push(buildAccessEvent(toggle, evalResult, user));
                 return clazz.cast(evalResult.getValue());
             }
@@ -323,8 +325,9 @@ public final class FeatureProbe {
         if (this.dataRepository.initialized()) {
             Toggle toggle = dataRepository.getToggle(toggleKey);
             Map<String, Segment> segments = dataRepository.getAllSegment();
+            Map<String, Toggle> toggles = dataRepository.getAllToggle();
             if (Objects.nonNull(toggle)) {
-                EvaluationResult evalResult = toggle.eval(user, segments, defaultValue);
+                EvaluationResult evalResult = toggle.eval(user, toggles, segments, defaultValue, 1);
                 if (isJson) {
                     String res = mapper.writeValueAsString(evalResult.getValue());
                     detail.setValue(mapper.readValue(res, clazz));
