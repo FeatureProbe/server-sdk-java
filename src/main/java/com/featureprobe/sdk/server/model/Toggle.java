@@ -45,6 +45,8 @@ public final class Toggle {
 
     private List<Object> variations;
 
+    private List<Prerequisite> prerequisites;
+
     private Boolean forClient;
 
     public EvaluationResult eval(FPUser user, Map<String, Segment> segments, Object defaultValue) {
@@ -177,4 +179,11 @@ public final class Toggle {
         return lastModified;
     }
 
+    public List<Prerequisite> getPrerequisites() {
+        return prerequisites;
+    }
+
+    public void setPrerequisites(List<Prerequisite> prerequisites) {
+        this.prerequisites = prerequisites;
+    }
 }
