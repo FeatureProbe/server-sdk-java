@@ -27,6 +27,13 @@ class SplitSpec extends Specification {
         }
     }
 
+    def "Get hash key" () {
+        when:
+        def hash = split.hash("13", "tutorial_rollout", 10000)
+        then:
+        hash == 9558
+    }
+
     def "User not has key"() {
         when:
         user = new FPUser()

@@ -14,27 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.featureprobe.sdk.server.exceptions;
 
-package com.featureprobe.sdk.server.model;
+public class PrerequisitesDeepOverflowException extends RuntimeException {
 
-public class Prerequisite {
-
-    private String key;
-    private Object value;
-
-    public void setKey(String key) {
-        this.key = key;
+    public PrerequisitesDeepOverflowException(String message) {
+        super(message);
     }
 
-    public void setValue(Object value) {
-        this.value = value;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public Object getValue() {
-        return value;
-    }
 }

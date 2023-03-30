@@ -20,6 +20,8 @@ package com.featureprobe.sdk.server.model;
 import com.featureprobe.sdk.server.EvaluationResult;
 import com.featureprobe.sdk.server.FPUser;
 import com.featureprobe.sdk.server.HitResult;
+import com.featureprobe.sdk.server.exceptions.PrerequisitesDeepOverflowException;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -58,9 +60,8 @@ public final class Toggle {
             return createDisabledResult(user, this.key, defaultValue);
         }
 
-        if(deep > 20) {
-            warning = "Exceeded maximum depth of 20";
-            return createDefaultResult(user, key, defaultValue, warning);
+        if(deep <= 0) {
+            throw new PrerequisitesDeepOverflowException("prerequisite deep overflow");
         }
 
         if (!prerequisite(user, toggles, segments, deep)) {
@@ -99,14 +100,18 @@ public final class Toggle {
         if (Objects.isNull(prerequisites) || prerequisites.isEmpty()) {
             return true;
         }
-        for (Prerequisite prerequisite : prerequisites) {
-            Toggle toggle = toggles.get(prerequisite.getKey());
-            if (Objects.isNull(toggle)) return false;
-            EvaluationResult eval = toggle.eval(user, toggles, segments, null, deep + 1);
-            if (Objects.isNull(eval.getValue())) return false;
-            if (!eval.getValue().equals(prerequisite.getValue())) {
-                return false;
+        try {
+            for (Prerequisite prerequisite : prerequisites) {
+                Toggle toggle = toggles.get(prerequisite.getKey());
+                if (Objects.isNull(toggle)) return false;
+                EvaluationResult eval = toggle.eval(user, toggles, segments, null, deep - 1);
+                if (Objects.isNull(eval.getValue())) return false;
+                if (!eval.getValue().equals(prerequisite.getValue())) {
+                    return false;
+                }
             }
+        } catch (PrerequisitesDeepOverflowException e) {
+            throw e;
         }
         return true;
     }
