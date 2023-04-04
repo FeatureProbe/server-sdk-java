@@ -13,6 +13,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.CI_TOKEN }}
+        submodules: true
     - name: Set up JDK 11
       uses: actions/setup-java@v3
       with:
@@ -25,7 +28,6 @@ jobs:
 
     - name: Build with Maven
       run: |
-        git submodule update --remote
         mvn -B package --file pom.xml
         mvn failsafe:integration-test
 
