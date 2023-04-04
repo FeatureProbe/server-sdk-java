@@ -218,6 +218,9 @@
                         <includes>
                             <include>**/*.md</include>
                         </includes>
+                        <excludes>
+                            <exclude>src/test/resources/test/**</exclude>
+                        </excludes>
                         <flexmark />
                     </markdown>
                 </configuration>
