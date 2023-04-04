@@ -32,6 +32,8 @@ public final class FPConfig {
 
     static final Long DEFAULT_START_WAIT = TimeUnit.SECONDS.toNanos(5);
 
+    static final Integer DEFAULT_MAX_DEPENDENT_DEEP = 20;
+
     protected static final FPConfig DEFAULT = new Builder().build();
 
     final Duration refreshInterval;
@@ -39,6 +41,8 @@ public final class FPConfig {
     final Long startWait;
 
     final URI remoteUri;
+
+    final Integer prerequisiteDeep;
 
     URL synchronizerUrl;
 
@@ -71,6 +75,8 @@ public final class FPConfig {
         this.eventUrl = builder.eventUrl;
         this.realtimeUri = builder.realtimeUri;
         this.startWait = builder.startWait == null ? DEFAULT_START_WAIT : builder.startWait;
+        this.prerequisiteDeep =
+                builder.prerequisiteDeep == null ? DEFAULT_MAX_DEPENDENT_DEEP : builder.prerequisiteDeep;
     }
 
     public static Builder builder() {
@@ -98,6 +104,8 @@ public final class FPConfig {
         private URI realtimeUri;
 
         private Long startWait;
+
+        private Integer prerequisiteDeep;
 
         public Builder() {
         }
@@ -174,6 +182,11 @@ public final class FPConfig {
 
         public Builder startWait(Long startWaitTime, TimeUnit unit) {
             this.startWait = unit.toNanos(startWaitTime);
+            return this;
+        }
+
+        public Builder prerequisiteDeep(Integer prerequisiteDeep) {
+            this.prerequisiteDeep = prerequisiteDeep;
             return this;
         }
 

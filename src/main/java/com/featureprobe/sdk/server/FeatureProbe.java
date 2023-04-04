@@ -19,6 +19,7 @@ package com.featureprobe.sdk.server;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.featureprobe.sdk.server.exceptions.PrerequisitesDeepOverflowException;
 import com.featureprobe.sdk.server.model.Segment;
 import com.featureprobe.sdk.server.model.Toggle;
 import com.google.common.annotations.VisibleForTesting;
@@ -59,9 +60,13 @@ public final class FeatureProbe {
     EventProcessor eventProcessor;
 
     @VisibleForTesting
+    FPConfig config;
+
+    @VisibleForTesting
     private FeatureProbe(DataRepository dataRepository) {
         this.dataRepository = dataRepository;
         FPConfig config = FPConfig.DEFAULT;
+        this.config = config;
         final FPContext context = new FPContext("test", config);
         eventProcessor = config.eventProcessorFactory.createEventProcessor(context);
     }
@@ -86,6 +91,7 @@ public final class FeatureProbe {
             throw new IllegalArgumentException("serverSDKKey must not be blank");
         }
         final FPContext context = new FPContext(serverSDKKey, config);
+        this.config = config;
         this.eventProcessor = config.eventProcessorFactory.createEventProcessor(context);
         this.dataRepository = config.dataRepositoryFactory.createDataRepository(context);
         this.synchronizer = config.synchronizerFactory.createSynchronizer(context, dataRepository);
@@ -255,8 +261,10 @@ public final class FeatureProbe {
         try {
             Toggle toggle = dataRepository.getToggle(toggleKey);
             Map<String, Segment> segments = dataRepository.getAllSegment();
+            Map<String, Toggle> toggles = dataRepository.getAllToggle();
             if (Objects.nonNull(toggle)) {
-                EvaluationResult evalResult = toggle.eval(user, segments, defaultValue);
+                EvaluationResult evalResult = toggle.eval(user, toggles, segments, defaultValue,
+                        config.prerequisiteDeep);
                 String value = mapper.writeValueAsString(evalResult.getValue());
                 eventProcessor.push(buildAccessEvent(toggle, evalResult, user));
                 return mapper.readValue(value, clazz);
@@ -273,8 +281,10 @@ public final class FeatureProbe {
         try {
             Toggle toggle = dataRepository.getToggle(toggleKey);
             Map<String, Segment> segments = dataRepository.getAllSegment();
+            Map<String, Toggle> toggles = dataRepository.getAllToggle();
             if (Objects.nonNull(toggle)) {
-                EvaluationResult evalResult = toggle.eval(user, segments, defaultValue);
+                EvaluationResult evalResult = toggle.eval(user, toggles, segments, defaultValue,
+                        config.prerequisiteDeep);
                 eventProcessor.push(buildAccessEvent(toggle, evalResult, user));
                 return clazz.cast(evalResult.getValue());
             }
@@ -308,6 +318,9 @@ public final class FeatureProbe {
         } catch (ClassCastException | JsonProcessingException e) {
             logger.error(LOG_CONVERSION_ERROR, toggleKey, e);
             detail.setReason(REASON_TYPE_MISMATCH);
+        } catch (PrerequisitesDeepOverflowException e) {
+            logger.error(e.getMessage(), toggleKey, e);
+            detail.setReason(e.getMessage());
         } catch (Exception e) {
             logger.error(LOG_HANDLE_ERROR, toggleKey, e);
             detail.setReason(REASON_HANDLE_ERROR);
@@ -323,8 +336,10 @@ public final class FeatureProbe {
         if (this.dataRepository.initialized()) {
             Toggle toggle = dataRepository.getToggle(toggleKey);
             Map<String, Segment> segments = dataRepository.getAllSegment();
+            Map<String, Toggle> toggles = dataRepository.getAllToggle();
             if (Objects.nonNull(toggle)) {
-                EvaluationResult evalResult = toggle.eval(user, segments, defaultValue);
+                EvaluationResult evalResult = toggle.eval(user, toggles, segments, defaultValue,
+                        config.prerequisiteDeep);
                 if (isJson) {
                     String res = mapper.writeValueAsString(evalResult.getValue());
                     detail.setValue(mapper.readValue(res, clazz));

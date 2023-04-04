@@ -96,7 +96,10 @@ public class Split {
     }
 
     private String getHashSalt(String toggleKey) {
-        return StringUtils.defaultString(salt, toggleKey);
+        if (StringUtils.isNotBlank(salt)) {
+            return salt;
+        }
+        return toggleKey;
     }
 
     public List<List<List<Integer>>> getDistribution() {

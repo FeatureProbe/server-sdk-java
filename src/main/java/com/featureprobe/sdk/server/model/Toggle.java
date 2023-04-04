@@ -20,9 +20,11 @@ package com.featureprobe.sdk.server.model;
 import com.featureprobe.sdk.server.EvaluationResult;
 import com.featureprobe.sdk.server.FPUser;
 import com.featureprobe.sdk.server.HitResult;
+import com.featureprobe.sdk.server.exceptions.PrerequisitesDeepOverflowException;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 public final class Toggle {
@@ -49,11 +51,21 @@ public final class Toggle {
 
     private Boolean forClient;
 
-    public EvaluationResult eval(FPUser user, Map<String, Segment> segments, Object defaultValue) {
+    public EvaluationResult eval(FPUser user, Map<String, Toggle> toggles, Map<String, Segment> segments,
+                                 Object defaultValue, int deep) {
+
         String warning = "";
 
         if (!enabled) {
             return createDisabledResult(user, this.key, defaultValue);
+        }
+
+        if (deep <= 0) {
+            throw new PrerequisitesDeepOverflowException("prerequisite deep overflow");
+        }
+
+        if (!prerequisite(user, toggles, segments, deep)) {
+            return createDefaultResult(user, key, defaultValue, warning);
         }
 
         if (rules != null && rules.size() > 0) {
@@ -82,6 +94,27 @@ public final class Toggle {
                 Optional.empty());
         defaultResult.setReason("Default rule hit. " + warning);
         return defaultResult;
+    }
+
+    private boolean prerequisite(FPUser user, Map<String, Toggle> toggles, Map<String, Segment> segments, int deep) {
+        if (Objects.isNull(prerequisites) || prerequisites.isEmpty()) {
+            return true;
+        }
+        try {
+            for (Prerequisite prerequisite : prerequisites) {
+                Toggle toggle = toggles.get(prerequisite.getKey());
+                if (Objects.isNull(toggle))
+                    return false;
+                EvaluationResult eval = toggle.eval(user, toggles, segments, null, deep - 1);
+                if (Objects.isNull(eval.getValue()))
+                    return false;
+                if (!eval.getValue().equals(prerequisite.getValue()))
+                    return false;
+            }
+        } catch (PrerequisitesDeepOverflowException e) {
+            throw e;
+        }
+        return true;
     }
 
     private EvaluationResult hitValue(HitResult hitResult, Object defaultValue, Optional<Integer> ruleIndex) {

@@ -10,7 +10,7 @@ import java.nio.charset.Charset
 class FeatureProbeSpec extends Specification {
 
 
-    def test_data_local = "test/server-sdk-specification/spec/toggle_simple_spec.json";
+    def test_data_local = "test/spec/toggle_simple_spec.json";
     def FeatureProbe featureProbe
     def ObjectMapper mapper
     def JsonNode testCase

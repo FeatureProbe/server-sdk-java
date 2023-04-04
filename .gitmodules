@@ -1,3 +1,4 @@
-[submodule "src/test/resources/test/server-sdk-specification"]
-	path = src/test/resources/test/server-sdk-specification
-	url = https://github.com/FeatureProbe/server-sdk-specification.git
+
+[submodule "src/test/resources/test"]
+	path = src/test/resources/test
+	url = git@github.com:FeatureProbe/server-sdk-specification.git
