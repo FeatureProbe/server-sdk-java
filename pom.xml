@@ -170,7 +170,8 @@
                         <include>**/*Test</include>
                         <include>**/*Spec</include>
                     </includes>
-                    <statelessTestsetReporter implementation="org.apache.maven.plugin.surefire.extensions.junit5.JUnit5Xml30StatelessReporter">
+                    <statelessTestsetReporter
+                            implementation="org.apache.maven.plugin.surefire.extensions.junit5.JUnit5Xml30StatelessReporter">
                         <disable>false</disable>
                         <version>3.0</version>
                         <usePhrasedFileName>false</usePhrasedFileName>
@@ -189,7 +190,7 @@
                         <eclipse>
                             <file>.github/misc/spotless-formatter.xml</file>
                         </eclipse>
-                        <removeUnusedImports />
+                        <removeUnusedImports/>
                         <licenseHeader>
                             <file>.github/misc/license-header</file>
                         </licenseHeader>
@@ -218,7 +219,7 @@
                         <includes>
                             <include>**/*.md</include>
                         </includes>
-                        <flexmark />
+                        <flexmark/>
                     </markdown>
                 </configuration>
             </plugin>
