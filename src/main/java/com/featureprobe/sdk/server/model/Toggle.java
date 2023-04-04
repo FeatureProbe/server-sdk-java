@@ -60,7 +60,7 @@ public final class Toggle {
             return createDisabledResult(user, this.key, defaultValue);
         }
 
-        if(deep <= 0) {
+        if (deep <= 0) {
             throw new PrerequisitesDeepOverflowException("prerequisite deep overflow");
         }
 
@@ -103,12 +103,13 @@ public final class Toggle {
         try {
             for (Prerequisite prerequisite : prerequisites) {
                 Toggle toggle = toggles.get(prerequisite.getKey());
-                if (Objects.isNull(toggle)) return false;
-                EvaluationResult eval = toggle.eval(user, toggles, segments, null, deep - 1);
-                if (Objects.isNull(eval.getValue())) return false;
-                if (!eval.getValue().equals(prerequisite.getValue())) {
+                if (Objects.isNull(toggle))
                     return false;
-                }
+                EvaluationResult eval = toggle.eval(user, toggles, segments, null, deep - 1);
+                if (Objects.isNull(eval.getValue()))
+                    return false;
+                if (!eval.getValue().equals(prerequisite.getValue()))
+                    return false;
             }
         } catch (PrerequisitesDeepOverflowException e) {
             throw e;
