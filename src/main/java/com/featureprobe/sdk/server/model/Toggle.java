@@ -20,7 +20,7 @@ package com.featureprobe.sdk.server.model;
 import com.featureprobe.sdk.server.EvaluationResult;
 import com.featureprobe.sdk.server.FPUser;
 import com.featureprobe.sdk.server.HitResult;
-import com.featureprobe.sdk.server.exceptions.PrerequisitesDeepOverflowException;
+import com.featureprobe.sdk.server.exceptions.PrerequisiteException;
 
 import java.util.List;
 import java.util.Map;
@@ -53,6 +53,21 @@ public final class Toggle {
 
     public EvaluationResult eval(FPUser user, Map<String, Toggle> toggles, Map<String, Segment> segments,
                                  Object defaultValue, int deep) {
+        EvaluationResult result = createDefaultResult(user, key, defaultValue, "");
+        try {
+            return doEval(user, toggles, segments, defaultValue, deep);
+        } catch (PrerequisiteException e) {
+            result.setReason(e.getMessage());
+        } catch (Exception e) {
+            throw e;
+        }
+
+        return result;
+    }
+
+
+    public EvaluationResult doEval(FPUser user, Map<String, Toggle> toggles, Map<String, Segment> segments,
+                                 Object defaultValue, int deep) {
 
         String warning = "";
 
@@ -61,7 +76,7 @@ public final class Toggle {
         }
 
         if (deep <= 0) {
-            throw new PrerequisitesDeepOverflowException("prerequisite deep overflow");
+            throw new PrerequisiteException("prerequisite deep overflow");
         }
 
         if (!prerequisite(user, toggles, segments, deep)) {
@@ -82,10 +97,11 @@ public final class Toggle {
         return createDefaultResult(user, this.key, defaultValue, warning);
     }
 
+
     private EvaluationResult createDisabledResult(FPUser user, String toggleKey, Object defaultValue) {
         EvaluationResult disabledResult = hitValue(disabledServe.evalIndex(user, this.key),
                 defaultValue, Optional.empty());
-        disabledResult.setReason("Toggle disabled");
+        disabledResult.setReason("Toggle disabled.");
         return disabledResult;
     }
 
@@ -100,19 +116,15 @@ public final class Toggle {
         if (Objects.isNull(prerequisites) || prerequisites.isEmpty()) {
             return true;
         }
-        try {
-            for (Prerequisite prerequisite : prerequisites) {
-                Toggle toggle = toggles.get(prerequisite.getKey());
-                if (Objects.isNull(toggle))
-                    return false;
-                EvaluationResult eval = toggle.eval(user, toggles, segments, null, deep - 1);
-                if (Objects.isNull(eval.getValue()))
-                    return false;
-                if (!eval.getValue().equals(prerequisite.getValue()))
-                    return false;
-            }
-        } catch (PrerequisitesDeepOverflowException e) {
-            throw e;
+        for (Prerequisite prerequisite : prerequisites) {
+            Toggle toggle = toggles.get(prerequisite.getKey());
+            if (Objects.isNull(toggle))
+                throw new PrerequisiteException("prerequisite not exist: " + this.key);
+            EvaluationResult eval = toggle.doEval(user, toggles, segments, null, deep - 1);
+            if (Objects.isNull(eval.getValue()))
+                return false;
+            if (!eval.getValue().equals(prerequisite.getValue()))
+                return false;
         }
         return true;
     }
