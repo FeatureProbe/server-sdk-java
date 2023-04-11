@@ -19,6 +19,7 @@ package com.featureprobe.sdk.server;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.featureprobe.sdk.server.exceptions.PrerequisitesDeepOverflowException;
 import com.featureprobe.sdk.server.model.Segment;
 import com.featureprobe.sdk.server.model.Toggle;
 import com.google.common.annotations.VisibleForTesting;
@@ -317,6 +318,9 @@ public final class FeatureProbe {
         } catch (ClassCastException | JsonProcessingException e) {
             logger.error(LOG_CONVERSION_ERROR, toggleKey, e);
             detail.setReason(REASON_TYPE_MISMATCH);
+        } catch (PrerequisitesDeepOverflowException e) {
+            logger.error(e.getMessage(), toggleKey, e);
+            detail.setReason(e.getMessage());
         } catch (Exception e) {
             logger.error(LOG_HANDLE_ERROR, toggleKey, e);
             detail.setReason(REASON_HANDLE_ERROR);
