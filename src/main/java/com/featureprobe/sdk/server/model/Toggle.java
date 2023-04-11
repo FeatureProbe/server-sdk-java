@@ -65,9 +65,8 @@ public final class Toggle {
         return result;
     }
 
-
     public EvaluationResult doEval(FPUser user, Map<String, Toggle> toggles, Map<String, Segment> segments,
-                                 Object defaultValue, int deep) {
+                                   Object defaultValue, int deep) {
 
         String warning = "";
 
@@ -96,7 +95,6 @@ public final class Toggle {
 
         return createDefaultResult(user, this.key, defaultValue, warning);
     }
-
 
     private EvaluationResult createDisabledResult(FPUser user, String toggleKey, Object defaultValue) {
         EvaluationResult disabledResult = hitValue(disabledServe.evalIndex(user, this.key),
