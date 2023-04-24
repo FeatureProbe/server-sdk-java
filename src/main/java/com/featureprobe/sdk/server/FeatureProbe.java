@@ -19,7 +19,6 @@ package com.featureprobe.sdk.server;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.featureprobe.sdk.server.exceptions.PrerequisitesDeepOverflowException;
 import com.featureprobe.sdk.server.model.Segment;
 import com.featureprobe.sdk.server.model.Toggle;
 import com.google.common.annotations.VisibleForTesting;
@@ -243,7 +242,7 @@ public final class FeatureProbe {
      * @param user      {@link FPUser}
      */
     public void track(String eventName, FPUser user) {
-        eventProcessor.push(new CustomEvent(eventName, user.getKey(), null));
+        eventProcessor.push(new CustomEvent(eventName, user, null));
     }
 
     /**
@@ -254,7 +253,7 @@ public final class FeatureProbe {
      * @param value     a numeric value
      */
     public void track(String eventName, FPUser user, double value) {
-        eventProcessor.push(new CustomEvent(eventName, user.getKey(), value));
+        eventProcessor.push(new CustomEvent(eventName, user, value));
     }
 
     private <T> T jsonEvaluate(String toggleKey, FPUser user, T defaultValue, Class<T> clazz) {
@@ -266,7 +265,7 @@ public final class FeatureProbe {
                 EvaluationResult evalResult = toggle.eval(user, toggles, segments, defaultValue,
                         config.prerequisiteDeep);
                 String value = mapper.writeValueAsString(evalResult.getValue());
-                eventProcessor.push(buildAccessEvent(toggle, evalResult, user));
+                trackEvent(toggle, evalResult, user);
                 return mapper.readValue(value, clazz);
             }
         } catch (JsonProcessingException e) {
@@ -285,7 +284,7 @@ public final class FeatureProbe {
             if (Objects.nonNull(toggle)) {
                 EvaluationResult evalResult = toggle.eval(user, toggles, segments, defaultValue,
                         config.prerequisiteDeep);
-                eventProcessor.push(buildAccessEvent(toggle, evalResult, user));
+                trackEvent(toggle, evalResult, user);
                 return clazz.cast(evalResult.getValue());
             }
         } catch (ClassCastException e) {
@@ -318,9 +317,6 @@ public final class FeatureProbe {
         } catch (ClassCastException | JsonProcessingException e) {
             logger.error(LOG_CONVERSION_ERROR, toggleKey, e);
             detail.setReason(REASON_TYPE_MISMATCH);
-        } catch (PrerequisitesDeepOverflowException e) {
-            logger.error(e.getMessage(), toggleKey, e);
-            detail.setReason(e.getMessage());
         } catch (Exception e) {
             logger.error(LOG_HANDLE_ERROR, toggleKey, e);
             detail.setReason(REASON_HANDLE_ERROR);
@@ -349,7 +345,7 @@ public final class FeatureProbe {
                 detail.setReason(evalResult.getReason());
                 detail.setRuleIndex(evalResult.getRuleIndex());
                 detail.setVersion(Optional.of(evalResult.getVersion()));
-                eventProcessor.push(buildAccessEvent(toggle, evalResult, user));
+                trackEvent(toggle, evalResult, user);
             } else {
                 detail.setReason("Toggle not exist");
                 detail.setValue(defaultValue);
@@ -361,12 +357,26 @@ public final class FeatureProbe {
         return detail;
     }
 
+    private void trackEvent(Toggle toggle, EvaluationResult evalResult, FPUser user) {
+        eventProcessor.push(buildAccessEvent(toggle, evalResult, user));
+        if (Objects.nonNull(dataRepository.getDebugUntilTime())
+                && dataRepository.getDebugUntilTime() >= System.currentTimeMillis()) {
+            eventProcessor.push(buildDebugEvent(toggle, evalResult, user));
+        }
+    }
+
     private Event buildAccessEvent(Toggle toggle, EvaluationResult evalResult, FPUser user) {
         boolean trackAccessEvents =
                 Objects.isNull(toggle.getTrackAccessEvents()) ? false : toggle.getTrackAccessEvents().booleanValue();
-        return new AccessEvent(user.getKey(), toggle.getKey(), evalResult.getValue(),
+        return new AccessEvent(user, toggle.getKey(), evalResult.getValue(),
                 evalResult.getVersion(), evalResult.getVariationIndex().orElse(null),
-                evalResult.getRuleIndex().orElse(null), evalResult.getReason(), trackAccessEvents);
+                evalResult.getRuleIndex().orElse(null), trackAccessEvents);
+    }
+
+    private Event buildDebugEvent(Toggle toggle, EvaluationResult evalResult, FPUser user) {
+        return new DebugEvent(user, toggle.getKey(), evalResult.getValue(),
+                evalResult.getVersion(), evalResult.getVariationIndex().orElse(null),
+                evalResult.getRuleIndex().orElse(null), evalResult.getReason());
     }
 
 }

@@ -36,6 +36,10 @@ public interface DataRepository extends Closeable {
 
     Map<String, Segment> getAllSegment();
 
+    Long getDebugUntilTime();
+
     boolean initialized();
+
+
 
 }

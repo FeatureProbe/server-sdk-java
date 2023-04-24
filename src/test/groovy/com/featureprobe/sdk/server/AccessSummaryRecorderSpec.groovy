@@ -10,7 +10,7 @@ class AccessSummaryRecorderSpec extends Specification {
     def setup() {
         accessRecorder = new AccessSummaryRecorder()
         FPUser user = new FPUser().stableRollout("test_user")
-        event = new AccessEvent(user.key, "test_toggle", "true", 1, 0, 1, "hid default rule.", true)
+        event = new AccessEvent(user, "test_toggle", "true", 1, 0, 1, true)
     }
 
     def "add a Event"() {
