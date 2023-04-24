@@ -40,6 +40,4 @@ public interface DataRepository extends Closeable {
 
     boolean initialized();
 
-
-
 }
