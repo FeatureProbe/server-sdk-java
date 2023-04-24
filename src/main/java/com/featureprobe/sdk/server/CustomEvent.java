@@ -23,8 +23,8 @@ public class CustomEvent extends Event {
 
     private final Double value;
 
-    public CustomEvent(String name, String user, Double value) {
-        super("custom", System.currentTimeMillis(), user);
+    public CustomEvent(String name, FPUser user, Double value) {
+        super("custom", System.currentTimeMillis(), user.getKey());
         this.name = name;
         this.value = value;
     }

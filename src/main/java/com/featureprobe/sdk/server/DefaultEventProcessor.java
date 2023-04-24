@@ -245,10 +245,11 @@ public class DefaultEventProcessor implements EventProcessor {
         void add(Event event) {
             if (event instanceof AccessEvent) {
                 access.add(event);
-                if (((AccessEvent) event).isTrackAccessEvents()) {
+                AccessEvent accessEvent = ((AccessEvent) event);
+                if (accessEvent.isTrackAccessEvents()) {
                     events.add(event);
                 }
-            } else if (event instanceof CustomEvent) {
+            } else {
                 events.add(event);
             }
         }

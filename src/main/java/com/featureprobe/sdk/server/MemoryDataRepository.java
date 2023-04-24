@@ -21,6 +21,7 @@ import com.featureprobe.sdk.server.model.Repository;
 import com.featureprobe.sdk.server.model.Segment;
 import com.featureprobe.sdk.server.model.Toggle;
 import com.google.common.collect.ImmutableMap;
+
 import java.util.Map;
 import java.util.Objects;
 
@@ -39,7 +40,7 @@ final class MemoryDataRepository implements DataRepository {
                 && Objects.nonNull(repository.getSegments())) {
             Map<String, Toggle> toggles = ImmutableMap.copyOf(repository.getToggles());
             Map<String, Segment> segments = ImmutableMap.copyOf(repository.getSegments());
-            data = new Repository(toggles, segments);
+            data = new Repository(toggles, segments, repository.getDebugUntilTime());
             this.initialized = true;
             this.updatedTimestamp = System.currentTimeMillis();
         }
@@ -76,6 +77,11 @@ final class MemoryDataRepository implements DataRepository {
             return data.getSegments();
         }
         return ImmutableMap.of();
+    }
+
+    @Override
+    public Long getDebugUntilTime() {
+        return data.getDebugUntilTime();
     }
 
     @Override
