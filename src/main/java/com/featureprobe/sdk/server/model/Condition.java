@@ -53,21 +53,25 @@ public final class Condition {
     static {
 
         stringMatchers.put(PredicateType.IS_ONE_OF, (target, objects) -> objects.contains(target));
-        stringMatchers.put(PredicateType.ENDS_WITH, (target, objects) -> objects.stream().anyMatch(target::endsWith));
+        stringMatchers.put(PredicateType.ENDS_WITH,
+                (target, objects) -> Objects.nonNull(target) && objects.stream().anyMatch(target::endsWith));
         stringMatchers.put(PredicateType.STARTS_WITH,
-                (target, objects) -> objects.stream().anyMatch(target::startsWith));
-        stringMatchers.put(PredicateType.CONTAINS, (target, objects) -> objects.stream().anyMatch(target::contains));
+                (target, objects) -> Objects.nonNull(target) && objects.stream().anyMatch(target::startsWith));
+        stringMatchers.put(PredicateType.CONTAINS,
+                (target, objects) -> Objects.nonNull(target) && objects.stream().anyMatch(target::contains));
         stringMatchers.put(PredicateType.MATCHES_REGEX,
-                (target, objects) -> objects.stream().anyMatch(s -> Pattern.compile(s).matcher(target).find()));
+                (target, objects) -> objects.stream()
+                        .anyMatch(s -> Objects.nonNull(target) && Pattern.compile(s).matcher(target).find()));
         stringMatchers.put(PredicateType.IS_NOT_ANY_OF, (target, objects) -> !objects.contains(target));
         stringMatchers.put(PredicateType.DOES_NOT_END_WITH,
-                (target, objects) -> objects.stream().noneMatch(target::endsWith));
+                (target, objects) -> Objects.nonNull(target) && objects.stream().noneMatch(target::endsWith));
         stringMatchers.put(PredicateType.DOES_NOT_START_WITH,
-                (target, objects) -> objects.stream().noneMatch(target::startsWith));
+                (target, objects) -> Objects.nonNull(target) && objects.stream().noneMatch(target::startsWith));
         stringMatchers.put(PredicateType.DOES_NOT_CONTAIN,
-                (target, objects) -> objects.stream().noneMatch(target::contains));
+                (target, objects) -> Objects.nonNull(target) && objects.stream().noneMatch(target::contains));
         stringMatchers.put(PredicateType.DOES_NOT_MATCH_REGEX,
-                (target, objects) -> objects.stream().noneMatch(s -> Pattern.compile(s).matcher(target).find()));
+                (target, objects) -> Objects.nonNull(target)
+                        && objects.stream().noneMatch(s -> Pattern.compile(s).matcher(target).find()));
 
         segmentMatchers.put(PredicateType.IS_IN,
                 (user, segments, objects) -> objects.stream().anyMatch(s -> segments.get(s).contains(user, segments)));
@@ -130,10 +134,10 @@ public final class Condition {
     }
 
     private boolean matchStringCondition(FPUser user) {
-        String subjectValue = user.getAttr(subject);
-        if (StringUtils.isBlank(subjectValue)) {
+        if (!user.containAttr(subject)) {
             return false;
         }
+        String subjectValue = user.getAttr(subject);
 
         StringMatcher stringMatcher = stringMatchers.get(this.predicate);
         if (Objects.isNull(stringMatcher)) {
