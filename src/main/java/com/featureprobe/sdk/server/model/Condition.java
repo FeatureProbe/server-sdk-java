@@ -130,10 +130,10 @@ public final class Condition {
     }
 
     private boolean matchStringCondition(FPUser user) {
-        String subjectValue = user.getAttr(subject);
-        if (StringUtils.isBlank(subjectValue)) {
+        if (!user.containAttr(subject)) {
             return false;
         }
+        String subjectValue = user.getAttr(subject);
 
         StringMatcher stringMatcher = stringMatchers.get(this.predicate);
         if (Objects.isNull(stringMatcher)) {
