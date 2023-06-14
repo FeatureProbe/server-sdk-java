@@ -65,7 +65,7 @@ public final class FPConfig {
         this.remoteUri = builder.remoteUri;
         this.location = builder.location;
         this.synchronizerFactory =
-                builder.synchronizer == null ? new StreamingSynchronizerFactory() : builder.synchronizer;
+                builder.synchronizer == null ? new PollingSynchronizerFactory() : builder.synchronizer;
         this.dataRepositoryFactory =
                 builder.dataRepository == null ? new MemoryDataRepositoryFactory() : builder.dataRepository;
         this.eventProcessorFactory = new DefaultEventProcessorFactory();
