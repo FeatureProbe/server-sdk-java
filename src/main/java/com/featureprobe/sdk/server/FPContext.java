@@ -126,40 +126,30 @@ final class FPContext {
     }
 
     private synchronized String getVersion() {
-        String version = null;
-        InputStream is = null;
-        try {
-            Properties p = new Properties();
-            is = getClass()
-                    .getResourceAsStream("/META-INF/maven/com.featureprobe/server-sdk-java/pom.properties");
+        try (InputStream is = getClass().getResourceAsStream("/META-INF/maven/com.featureprobe/server-sdk-java/pom.properties")) {
             if (is != null) {
+                Properties p = new Properties();
                 p.load(is);
-                version = p.getProperty("version", DEFAULT_SDK_VERSION);
+                return p.getProperty("version", DEFAULT_SDK_VERSION);
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             logger.error("get version error", e);
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    logger.error("close stream error");
-                }
-            }
         }
-        if (version == null) {
-            Package aPackage = getClass().getPackage();
-            if (aPackage != null) {
-                version = aPackage.getImplementationVersion();
-                if (version == null) {
-                    version = aPackage.getSpecificationVersion();
-                }
-            }
+
+        Package aPackage = getClass().getPackage();
+        if (aPackage == null) {
+            return DEFAULT_SDK_VERSION;
         }
-        if (version == null) {
-            version = DEFAULT_SDK_VERSION;
+
+        String version = aPackage.getImplementationVersion();
+        if (version != null) {
+            return version;
         }
-        return version;
+        version = aPackage.getSpecificationVersion();
+        if (version != null) {
+            return version;
+        }
+        return DEFAULT_SDK_VERSION;
     }
 
     public URI getRealtimeUri() {
