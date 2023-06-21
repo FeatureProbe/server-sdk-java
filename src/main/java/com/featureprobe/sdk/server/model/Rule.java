@@ -31,6 +31,9 @@ public final class Rule {
     private List<Condition> conditions;
 
     public HitResult hit(FPUser user, Map<String, Segment> segments, String toggleKey) {
+        if (user == null || toggleKey == null || toggleKey.isEmpty()) {
+            return new HitResult(false);
+        }
         for (Condition condition : conditions) {
             if (condition.getType() != ConditionType.SEGMENT
                     && condition.getType() != ConditionType.DATETIME
