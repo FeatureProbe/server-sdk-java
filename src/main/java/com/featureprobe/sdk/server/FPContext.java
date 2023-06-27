@@ -20,6 +20,7 @@ package com.featureprobe.sdk.server;
 import okhttp3.Headers;
 import org.slf4j.Logger;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -29,7 +30,7 @@ import java.time.Duration;
 import java.util.Objects;
 import java.util.Properties;
 
-final class FPContext {
+class FPContext {
 
     private static final Logger logger = Loggers.MAIN;
 
@@ -81,19 +82,17 @@ final class FPContext {
                 this.realtimeUri = config.realtimeUri;
             }
         } catch (MalformedURLException e) {
-            logger.error("construction context error", e);
+            logger.error("construction context error MalformedURLException");
         } catch (URISyntaxException e) {
-            logger.error("construction context error", e);
+            logger.error("construction context error URISyntaxException");
         }
         this.serverSdkKey = serverSdkKey;
         this.refreshInterval = config.refreshInterval;
         this.location = config.location;
         this.httpConfiguration = config.httpConfiguration;
         String sdkVersion = getVersion();
-        this.headers = config.httpConfiguration.headers.newBuilder()
-                .add(GET_SDK_KEY_HEADER, serverSdkKey)
-                .add(USER_AGENT_HEADER, SDK_FLAG_PREFIX + sdkVersion)
-                .build();
+        this.headers = config.httpConfiguration.headers.newBuilder().add(GET_SDK_KEY_HEADER, serverSdkKey)
+                .add(USER_AGENT_HEADER, SDK_FLAG_PREFIX + sdkVersion).build();
     }
 
     public URL getSynchronizerUrl() {
@@ -124,32 +123,41 @@ final class FPContext {
         return headers;
     }
 
-    private synchronized String getVersion() {
-        String version = null;
-        try {
-            Properties p = new Properties();
-            InputStream is = getClass()
-                    .getResourceAsStream("/META-INF/maven/com.featureprobe/server-sdk-java/pom.properties");
+    public synchronized String getVersion() {
+        try (
+                InputStream is =
+                        getResourceAsStream("/META-INF/maven/com.featureprobe/server-sdk-java/pom.properties")) {
             if (is != null) {
+                Properties p = new Properties();
                 p.load(is);
-                version = p.getProperty("version", DEFAULT_SDK_VERSION);
+                return p.getProperty("version", DEFAULT_SDK_VERSION);
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
+            logger.error("get version error", e);
+        }
 
+        Package aPackage = getPackage();
+        if (aPackage == null) {
+            return DEFAULT_SDK_VERSION;
         }
-        if (version == null) {
-            Package aPackage = getClass().getPackage();
-            if (aPackage != null) {
-                version = aPackage.getImplementationVersion();
-                if (version == null) {
-                    version = aPackage.getSpecificationVersion();
-                }
-            }
+
+        String version = aPackage.getImplementationVersion();
+        if (version != null) {
+            return version;
         }
-        if (version == null) {
-            version = DEFAULT_SDK_VERSION;
+        version = aPackage.getSpecificationVersion();
+        if (version != null) {
+            return version;
         }
-        return version;
+        return DEFAULT_SDK_VERSION;
+    }
+
+    protected Package getPackage() {
+        return getClass().getPackage();
+    }
+
+    protected InputStream getResourceAsStream(String resource) {
+        return getClass().getResourceAsStream(resource);
     }
 
     public URI getRealtimeUri() {
