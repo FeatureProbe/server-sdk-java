@@ -5,7 +5,6 @@ import spock.lang.Specification
 class FPContextSpec extends Specification {
 
     def fpContextInstance = new FPContext("", new FPConfig(new FPConfig.Builder()))
-    def DEFAULT_SDK_VERSION = 'unknown'
 
     def 'test getVersion when properties file exists'() {
         given:
@@ -65,7 +64,7 @@ class FPContextSpec extends Specification {
         String actualVersion = spyFPContextInstance.getVersion()
 
         then:
-        actualVersion == DEFAULT_SDK_VERSION
+        actualVersion == "unknown"
     }
 
     private String propertiesToString(Properties properties) {
