@@ -30,7 +30,7 @@ import java.time.Duration;
 import java.util.Objects;
 import java.util.Properties;
 
-final class FPContext {
+class FPContext {
 
     private static final Logger logger = Loggers.MAIN;
 
@@ -91,10 +91,8 @@ final class FPContext {
         this.location = config.location;
         this.httpConfiguration = config.httpConfiguration;
         String sdkVersion = getVersion();
-        this.headers = config.httpConfiguration.headers.newBuilder()
-                .add(GET_SDK_KEY_HEADER, serverSdkKey)
-                .add(USER_AGENT_HEADER, SDK_FLAG_PREFIX + sdkVersion)
-                .build();
+        this.headers = config.httpConfiguration.headers.newBuilder().add(GET_SDK_KEY_HEADER, serverSdkKey)
+                .add(USER_AGENT_HEADER, SDK_FLAG_PREFIX + sdkVersion).build();
     }
 
     public URL getSynchronizerUrl() {
@@ -125,10 +123,10 @@ final class FPContext {
         return headers;
     }
 
-    private synchronized String getVersion() {
+    public synchronized String getVersion() {
         try (
-                InputStream is = getClass()
-                        .getResourceAsStream("/META-INF/maven/com.featureprobe/server-sdk-java/pom.properties")) {
+                InputStream is =
+                        getResourceAsStream("/META-INF/maven/com.featureprobe/server-sdk-java/pom.properties")) {
             if (is != null) {
                 Properties p = new Properties();
                 p.load(is);
@@ -138,7 +136,7 @@ final class FPContext {
             logger.error("get version error", e);
         }
 
-        Package aPackage = getClass().getPackage();
+        Package aPackage = getaPackage();
         if (aPackage == null) {
             return DEFAULT_SDK_VERSION;
         }
@@ -152,6 +150,14 @@ final class FPContext {
             return version;
         }
         return DEFAULT_SDK_VERSION;
+    }
+
+    protected Package getaPackage() {
+        return getClass().getPackage();
+    }
+
+    protected InputStream getResourceAsStream(String resource) {
+        return getClass().getResourceAsStream(resource);
     }
 
     public URI getRealtimeUri() {
