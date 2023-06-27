@@ -29,7 +29,7 @@ class FPContextSpec extends Specification {
         mockedPackage.getSpecificationVersion() >> '1.0.2'
         FPContext spyFPContextInstance = Spy(fpContextInstance)
         spyFPContextInstance.getResourceAsStream(_) >> null
-        spyFPContextInstance.getaPackage() >> mockedPackage
+        spyFPContextInstance.getPackage() >> mockedPackage
 
         when:
         String actualVersion = spyFPContextInstance.getVersion()
@@ -45,7 +45,7 @@ class FPContextSpec extends Specification {
         mockedPackage.getSpecificationVersion() >> '1.0.2'
         FPContext spyFPContextInstance = Spy(fpContextInstance)
         spyFPContextInstance.getResourceAsStream(_) >> null
-        spyFPContextInstance.getaPackage() >> mockedPackage
+        spyFPContextInstance.getPackage() >> mockedPackage
 
         when:
         String actualVersion = spyFPContextInstance.getVersion()
@@ -58,7 +58,7 @@ class FPContextSpec extends Specification {
         given:
         FPContext spyFPContextInstance = Spy(fpContextInstance)
         spyFPContextInstance.getResourceAsStream(_) >> null
-        spyFPContextInstance.getaPackage() >> null
+        spyFPContextInstance.getPackage() >> null
 
         when:
         String actualVersion = spyFPContextInstance.getVersion()

@@ -136,7 +136,7 @@ class FPContext {
             logger.error("get version error", e);
         }
 
-        Package aPackage = getaPackage();
+        Package aPackage = getPackage();
         if (aPackage == null) {
             return DEFAULT_SDK_VERSION;
         }
@@ -152,7 +152,7 @@ class FPContext {
         return DEFAULT_SDK_VERSION;
     }
 
-    protected Package getaPackage() {
+    protected Package getPackage() {
         return getClass().getPackage();
     }
 
