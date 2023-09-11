@@ -110,7 +110,8 @@ public class Toggle {
         return defaultResult;
     }
 
-    protected boolean meetPrerequisite(FPUser user, Map<String, Toggle> toggles, Map<String, Segment> segments, int depth) {
+    protected boolean meetPrerequisite(FPUser user, Map<String, Toggle> toggles, Map<String, Segment> segments,
+                                       int depth) {
         if (Objects.isNull(prerequisites) || prerequisites.isEmpty()) {
             return true;
         }
