@@ -46,9 +46,11 @@ class FeatureProbeSpec extends Specification {
     }
 
 
-    def "FeatureProbe case test"() {
+    def "FeatureProbe Server Side Java SDK specification test"() {
         when:
         def tests = testCase.get("tests").asList()
+
+        then:
         for (int i = 0; i < tests.size(); i++) {
             def scenario = tests.get(i)
             def name = scenario.get("scenario").asText()
@@ -118,19 +120,13 @@ class FeatureProbeSpec extends Specification {
                         def stringDetailRes = featureProbe.stringDetail(toggleKey, user,
                                 defaultValue.asText())
                         assert stringDetailRes.value == expectValue.asText()
+                        if (expectResult.get("reason") != null) {
+                            assert stringDetailRes.reason.containsIgnoreCase(expectResult.get("reason").asText())
+                        }
                         break
                 }
             }
         }
-        then:
-        with(FeatureProbe) {
-
-        }
-    }
-
-
-    def "FeatureProbe repository uninitialized"() {
-
     }
 
 }
