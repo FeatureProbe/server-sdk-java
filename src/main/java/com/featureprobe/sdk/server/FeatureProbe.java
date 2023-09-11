@@ -316,7 +316,6 @@ public final class FeatureProbe {
             return getEvaluateDetail(toggleKey, user, defaultValue, clazz, false);
         } catch (ClassCastException | JsonProcessingException e) {
             logger.error(LOG_CONVERSION_ERROR, toggleKey, e);
-            detail.setValue(defaultValue);
             detail.setReason(REASON_TYPE_MISMATCH);
         } catch (Exception e) {
             logger.error(LOG_HANDLE_ERROR, toggleKey, e);
