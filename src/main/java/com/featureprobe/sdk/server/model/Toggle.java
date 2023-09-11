@@ -75,7 +75,7 @@ public class Toggle {
         }
 
         if (depth <= 0) {
-            throw new PrerequisiteException("meetPrerequisite depth overflow");
+            throw new PrerequisiteException("prerequisite depth overflow");
         }
 
         if (!meetPrerequisite(user, toggles, segments, depth)) {
