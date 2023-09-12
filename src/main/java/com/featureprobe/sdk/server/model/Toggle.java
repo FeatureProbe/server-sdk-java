@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-public final class Toggle {
+public class Toggle {
 
     private String key;
 
@@ -53,7 +53,7 @@ public final class Toggle {
 
     public EvaluationResult eval(FPUser user, Map<String, Toggle> toggles, Map<String, Segment> segments,
                                  Object defaultValue, int deep) {
-        EvaluationResult result = createDefaultResult(user, key, defaultValue, "");
+        EvaluationResult result = createDisabledResult(user, key, defaultValue);
         try {
             return doEval(user, toggles, segments, defaultValue, deep);
         } catch (PrerequisiteException e) {
@@ -66,7 +66,7 @@ public final class Toggle {
     }
 
     public EvaluationResult doEval(FPUser user, Map<String, Toggle> toggles, Map<String, Segment> segments,
-                                   Object defaultValue, int deep) {
+                                   Object defaultValue, int depth) {
 
         String warning = "";
 
@@ -74,15 +74,15 @@ public final class Toggle {
             return createDisabledResult(user, this.key, defaultValue);
         }
 
-        if (deep <= 0) {
-            throw new PrerequisiteException("prerequisite deep overflow");
+        if (depth <= 0) {
+            throw new PrerequisiteException("prerequisite depth overflow");
         }
 
-        if (!prerequisite(user, toggles, segments, deep)) {
-            return createDefaultResult(user, key, defaultValue, warning);
+        if (!meetPrerequisite(user, toggles, segments, depth)) {
+            return createDisabledResult(user, key, defaultValue);
         }
 
-        if (rules != null && rules.size() > 0) {
+        if (rules != null && !rules.isEmpty()) {
             for (int i = 0; i < rules.size(); i++) {
                 Rule rule = rules.get(i);
                 HitResult hitResult = rule.hit(user, segments, this.key);
@@ -110,7 +110,8 @@ public final class Toggle {
         return defaultResult;
     }
 
-    private boolean prerequisite(FPUser user, Map<String, Toggle> toggles, Map<String, Segment> segments, int deep) {
+    protected boolean meetPrerequisite(FPUser user, Map<String, Toggle> toggles, Map<String, Segment> segments,
+                                       int depth) {
         if (Objects.isNull(prerequisites) || prerequisites.isEmpty()) {
             return true;
         }
@@ -118,7 +119,7 @@ public final class Toggle {
             Toggle toggle = toggles.get(prerequisite.getKey());
             if (Objects.isNull(toggle))
                 throw new PrerequisiteException("prerequisite not exist: " + this.key);
-            EvaluationResult eval = toggle.doEval(user, toggles, segments, null, deep - 1);
+            EvaluationResult eval = toggle.doEval(user, toggles, segments, null, depth - 1);
             if (Objects.isNull(eval.getValue()))
                 return false;
             if (!eval.getValue().equals(prerequisite.getValue()))
