@@ -27,13 +27,16 @@ public final class Repository {
 
     private Long debugUntilTime;
 
+    private Long version;
+
     public Repository() {
     }
 
-    public Repository(Map<String, Toggle> toggles, Map<String, Segment> segments, Long debugUntilTime) {
+    public Repository(Map<String, Toggle> toggles, Map<String, Segment> segments, Long debugUntilTime, Long version) {
         this.toggles = toggles;
         this.segments = segments;
         this.debugUntilTime = debugUntilTime;
+        this.version = version;
     }
 
     public Map<String, Toggle> getToggles() {
@@ -58,5 +61,13 @@ public final class Repository {
 
     public void setDebugUntilTime(Long debugUntilTime) {
         this.debugUntilTime = debugUntilTime;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 }

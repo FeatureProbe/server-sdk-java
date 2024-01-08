@@ -38,9 +38,15 @@ final class MemoryDataRepository implements DataRepository {
 
         if (Objects.nonNull(repository) && Objects.nonNull(repository.getToggles())
                 && Objects.nonNull(repository.getSegments())) {
+            if (Objects.nonNull(data)
+                    && Objects.nonNull(data.getVersion())
+                    && Objects.nonNull(repository.getVersion())
+                    && data.getVersion() >= repository.getVersion()) {
+                return;
+            }
             Map<String, Toggle> toggles = ImmutableMap.copyOf(repository.getToggles());
             Map<String, Segment> segments = ImmutableMap.copyOf(repository.getSegments());
-            data = new Repository(toggles, segments, repository.getDebugUntilTime());
+            data = new Repository(toggles, segments, repository.getDebugUntilTime(), repository.getVersion());
             this.initialized = true;
             this.updatedTimestamp = System.currentTimeMillis();
         }
